@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#C0392B">
+<title>掃碼點餐 · 丸事星期二｜大埔振興肉丸</title>
+<style>
+  :root{
+    --bg:#F7F4EF; --card:#FFFFFF; --ink:#2B2118; --muted:#8A7E70;
+    --brand:#C0392B; --brand-d:#96291F; --gold:#C9A227; --accent:#E8A33D;
+    --line:#EAE3D8; --green:#2E7D52;
+    --font:"PingFang HK","PingFang SC","Microsoft JhengHei","Noto Sans HK",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.55}
+  .app{max-width:430px;margin:0 auto;min-height:100vh;background:var(--bg);position:relative;padding-bottom:96px}
+
+  /* ---------- demo switch ---------- */
+  .demobar{background:#1F1A15;color:#F0E9DF;padding:8px 14px;display:flex;align-items:center;gap:8px;font-size:12px;position:sticky;top:0;z-index:60}
+  .demobar b{font-weight:600;color:#fff;white-space:nowrap}
+  .seg{margin-left:auto;display:flex;background:#3A322A;border-radius:999px;padding:2px}
+  .seg button{border:0;background:transparent;color:#CFC5B8;font-family:var(--font);font-size:12px;padding:5px 11px;border-radius:999px;cursor:pointer}
+  .seg button.on{background:var(--brand);color:#fff;font-weight:600}
+
+  /* ---------- header ---------- */
+  header.shop{background:var(--card);padding:14px 16px 12px;border-bottom:1px solid var(--line)}
+  .shop-row{display:flex;align-items:center;gap:10px}
+  .logo{width:40px;height:40px;border-radius:10px;background:linear-gradient(145deg,#D9513F,#96291F);color:#fff;
+        display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex:none;letter-spacing:-1px}
+  .shop-name{font-size:16px;font-weight:700;letter-spacing:.3px}
+  .shop-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .table-chip{margin-left:auto;background:#FBF6EE;border:1px solid var(--line);border-radius:999px;padding:5px 11px;font-size:12px;color:var(--brand-d);font-weight:600;white-space:nowrap}
+
+  /* ---------- endorsement seal ---------- */
+  .seal{display:flex;align-items:center;gap:9px;background:#FFFDF8;border-top:1px solid var(--line);
+        padding:9px 16px;font-size:11.5px;color:#6B5B47}
+  .seal .stamp{flex:none;width:34px;height:34px;border:1.5px solid var(--brand);border-radius:8px;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--brand);line-height:1}
+  .seal .stamp b{font-size:11px;font-weight:800}
+  .seal .stamp span{font-size:7.5px;letter-spacing:.5px;margin-top:1px}
+  .seal .txt b{color:var(--brand-d)}
+
+  /* ---------- activity banner ---------- */
+  .banner{margin:12px 14px 0;border-radius:16px;overflow:hidden;position:relative;
+          background:linear-gradient(135deg,#C0392B 0%,#96291F 60%,#7A1F17 100%);color:#fff;
+          padding:16px 16px 14px;box-shadow:0 8px 22px -10px rgba(192,57,43,.75)}
+  .banner .kicker{font-size:11px;letter-spacing:2px;opacity:.8;font-weight:600}
+  .banner h1{margin:3px 0 4px;font-size:23px;font-weight:800;letter-spacing:.5px}
+  .banner p{margin:0;font-size:12.5px;opacity:.95;line-height:1.5;max-width:72%}
+  .banner .mascot{position:absolute;right:6px;bottom:-6px;width:104px;height:104px;pointer-events:none}
+  .banner .rule{margin-top:10px;display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+          border-radius:10px;padding:6px 10px;font-size:11.5px;font-weight:600;backdrop-filter:blur(2px)}
+
+  /* ---------- gift progress ---------- */
+  .gifts{margin:12px 14px 0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px}
+  .gifts h2{margin:0 0 3px;font-size:13.5px;font-weight:700}
+  .gifts .hint{font-size:11.5px;color:var(--muted);margin-bottom:10px}
+  .track{position:relative;height:9px;background:#F0EAE1;border-radius:999px;overflow:hidden}
+  .fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#E8A33D,#C0392B);transition:width .45s cubic-bezier(.2,.8,.3,1)}
+  .markers{position:relative;height:16px;margin-top:2px}
+  .markers i{position:absolute;top:0;transform:translateX(-50%);font-size:10px;color:var(--muted);white-space:nowrap;font-style:normal}
+  .gift-rows{margin-top:9px;display:grid;gap:7px}
+  .gift{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;background:#FBF8F3;border:1px dashed var(--line);font-size:12.5px}
+  .gift.lock{opacity:.55}
+  .gift.ok{background:#F3FAF5;border-color:#BFE3CC;border-style:solid}
+  .gift .amt{font-weight:800;color:var(--brand-d);flex:none;font-size:12px}
+  .gift .lv{margin-left:auto;font-size:11px;font-weight:700;flex:none}
+  .gift.ok .lv{color:var(--green)}
+
+  /* ---------- menu ---------- */
+  .cat{margin:18px 14px 8px;font-size:13px;font-weight:700;color:#5C4B39;display:flex;align-items:center;gap:7px}
+  .cat:after{content:"";height:1px;background:var(--line);flex:1}
+  .item{display:flex;gap:11px;margin:0 14px 9px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px}
+  .thumb{width:54px;height:54px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;
+         background:#FBF6EE;border:1px solid var(--line);overflow:hidden}
+  .info{flex:1;min-width:0}
+  .name{font-size:14px;font-weight:650;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .badge{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:5px;background:#FDECEA;color:var(--brand);border:1px solid #F5C7C2;white-space:nowrap}
+  .plus{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:5px;background:#FFF6E2;color:#9A6B12;border:1px solid #F0D9A3;white-space:nowrap}
+  .desc{font-size:11.5px;color:var(--muted);margin-top:3px}
+  .row2{display:flex;align-items:center;margin-top:8px}
+  .price{font-size:15px;font-weight:800;color:var(--brand-d)}
+  .price small{font-size:11px;font-weight:600}
+  .stepper{margin-left:auto;display:flex;align-items:center;gap:9px}
+  .stepper button{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);background:#fff;color:var(--brand);
+        font-size:16px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+  .stepper button.pri{background:var(--brand);border-color:var(--brand);color:#fff}
+  .stepper .qty{min-width:16px;text-align:center;font-weight:700;font-size:14px}
+  .stepper .qty.zero{color:#C9BFB3;font-weight:500}
+
+  /* ---------- footer note ---------- */
+  .note{margin:20px 14px 8px;font-size:11px;color:#9C8F80;line-height:1.7;text-align:center}
+  .note b{color:#7A6A57}
+
+  /* ---------- sticky cart ---------- */
+  .cartbar{position:fixed;left:0;right:0;bottom:0;z-index:70;padding:10px 14px calc(12px + env(safe-area-inset-bottom));
+           background:linear-gradient(180deg,rgba(247,244,239,0),var(--bg) 32%)}
+  .cartinner{max-width:430px;margin:0 auto;background:#2B2118;color:#fff;border-radius:15px;padding:11px 13px;
+           display:flex;align-items:center;gap:12px;box-shadow:0 10px 26px -10px rgba(0,0,0,.55)}
+  .cartinner .tot{font-size:19px;font-weight:800}
+  .cartinner .tot small{font-size:11px;font-weight:600;opacity:.75}
+  .cartinner .cnt{font-size:11px;opacity:.72;margin-top:1px}
+  .cartinner button{margin-left:auto;background:var(--brand);border:0;color:#fff;font-family:var(--font);
+           font-size:14px;font-weight:700;padding:11px 20px;border-radius:11px;cursor:pointer;white-space:nowrap}
+  .cartinner button:disabled{background:#544638;color:#9C8F80;cursor:not-allowed}
+
+  /* ---------- sheet ---------- */
+  .mask{position:fixed;inset:0;background:rgba(30,22,16,.5);z-index:80;display:none;align-items:flex-end;justify-content:center}
+  .mask.on{display:flex}
+  .sheet{width:100%;max-width:430px;background:var(--card);border-radius:20px 20px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));
+         max-height:92vh;overflow:auto;animation:up .28s cubic-bezier(.2,.8,.3,1)}
+  @keyframes up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}
+  .sheet h2{margin:0 0 4px;font-size:17px;font-weight:800}
+  .sheet .sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+  .pick{border:1px solid var(--line);border-radius:13px;padding:11px 12px;display:flex;gap:10px;align-items:center;margin-bottom:9px;cursor:pointer;background:#FCFAF6}
+  .pick.sel{border-color:var(--brand);background:#FDF1EF;box-shadow:0 0 0 1.5px rgba(192,57,43,.18) inset}
+  .pick .t{flex:1}
+  .pick .t b{font-size:13.5px}
+  .pick .t div{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .radio{width:20px;height:20px;border-radius:50%;border:1.5px solid #D8CDBE;flex:none;display:flex;align-items:center;justify-content:center}
+  .pick.sel .radio{border-color:var(--brand)}
+  .pick.sel .radio:after{content:"";width:10px;height:10px;border-radius:50%;background:var(--brand)}
+  .bigbtn{width:100%;border:0;background:var(--brand);color:#fff;font-family:var(--font);font-size:15px;font-weight:700;
+          padding:14px;border-radius:13px;margin-top:8px;cursor:pointer}
+  .ghost{width:100%;border:0;background:transparent;color:var(--muted);font-family:var(--font);font-size:13px;padding:11px;cursor:pointer}
+
+  .coupon{background:linear-gradient(135deg,#FFF9EC,#FFF3D9);border:1px solid #F0D9A3;border-radius:14px;padding:12px;margin-bottom:10px}
+  .coupon .ct{font-size:13.5px;font-weight:800;color:#8A5E0B}
+  .coupon .cd{font-size:11.5px;color:#9A7B3A;margin-top:2px}
+  .code{margin-top:9px;display:flex;align-items:center;gap:9px;background:#fff;border:1.5px dashed #D9B96A;border-radius:10px;padding:9px 11px}
+  .code span{font-family:ui-monospace,Consolas,monospace;font-size:15px;font-weight:700;letter-spacing:1.4px;color:#8A5E0B;flex:1}
+  .code button{border:1px solid #D9B96A;background:#FFFBEF;color:#8A5E0B;font-family:var(--font);font-size:11.5px;
+          font-weight:700;padding:5px 10px;border-radius:7px;cursor:pointer}
+  .done{text-align:center;padding:6px 0 2px}
+  .done .tick{width:52px;height:52px;margin:0 auto 10px;border-radius:50%;background:#EAF7EF;display:flex;align-items:center;justify-content:center}
+  .done h2{text-align:center}
+  .done .sub{text-align:center}
+  .legal{font-size:10.5px;color:#A99B8B;line-height:1.7;margin-top:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ 示範模式開關（演示用，正式版移除） ============ -->
+  <div class="demobar">
+    <b>示範 DEMO</b><span style="opacity:.7">活動日切換</span>
+    <div class="seg">
+      <button id="btnTue" class="on" onclick="setDay(true)">星期二（活動中）</button>
+      <button id="btnDay" onclick="setDay(false)">平日</button>
+    </div>
+  </div>
+
+  <!-- ============ 店頭 ============ -->
+  <header class="shop">
+    <div class="shop-row">
+      <div class="logo">發記</div>
+      <div>
+        <div class="shop-name">發記潮式粉麵</div>
+        <div class="shop-sub">示範合作店 · 掃碼自助點餐</div>
+      </div>
+      <div class="table-chip">A12 檯 · 2 位</div>
+    </div>
+  </header>
+
+  <!-- ============ 背書標識（可通用於所有合作店） ============ -->
+  <div class="seal">
+    <div class="stamp"><b>振興</b><span>SUPPLY</span></div>
+    <div class="txt">本店丸類由 <b>大埔振興肉丸</b> 供應　·　1967 年創立　·　百分百牛肉</div>
+  </div>
+
+  <!-- ============ 活動橫幅 ============ -->
+  <div class="banner" id="banner">
+    <div class="kicker">TUESDAY ONLY · 逢二限定</div>
+    <h1>丸事星期二</h1>
+    <p>指定振興丸類菜式<b>加量 2 粒</b>，價格不變；滿額再送限量「丸侠」。</p>
+    <div class="rule">逢星期二 11:00–21:00 · 每店每日限量</div>
+    <div class="mascot" id="mascotBig"></div>
+  </div>
+
+  <!-- ============ 贈品進度 ============ -->
+  <div class="gifts" id="gifts">
+    <h2>今日贈品進度</h2>
+    <div class="hint" id="giftHint">仲差 $88 就解鎖「丸侠」限量公仔</div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="markers">
+      <i style="left:65.9%">$58</i><i style="left:100%;transform:translateX(-100%)">$88</i>
+    </div>
+    <div class="gift-rows">
+      <div class="gift lock" id="g58">
+        <span class="amt">滿 $58</span>
+        <span>急凍小分量牛丸 100g 兌換券（可帶返屋企煮）</span>
+        <span class="lv">未解鎖</span>
+      </div>
+      <div class="gift lock" id="g88">
+        <span class="amt">滿 $88</span>
+        <span>限量「丸侠」公仔 1 隻（每店每日 20 隻）</span>
+        <span class="lv">未解鎖</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ 菜單 ============ -->
+  <div class="cat">振興丸類 · 招牌</div>
+  <div id="listA"></div>
+
+  <div class="cat">湯麵 · 主食</div>
+  <div id="listB"></div>
+
+  <div class="cat">飲品 · 小食</div>
+  <div id="listC"></div>
+
+  <div class="note">
+    <b>「丸事星期二」</b>為大埔振興肉丸與合作餐廳之聯合推廣活動。<br>
+    贈品每日限量，送完即止；兌換券有效期 30 日，可於大埔振興門市、官網或 App 使用。
+  </div>
+</div>
+
+<!-- ============ 底部購物車 ============ -->
+<div class="cartbar">
+  <div class="cartinner">
+    <div>
+      <div class="tot"><small>HK$</small><span id="tot">0</span></div>
+      <div class="cnt" id="cnt">未選擇餐點</div>
+    </div>
+    <button id="payBtn" disabled onclick="openSheet()">去結算</button>
+  </div>
+</div>
+
+<!-- ============ 彈層 ============ -->
+<div class="mask" id="mask" onclick="if(event.target===this)closeSheet()">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+/* ================= 丸侠 Beet Ball Man mascot（依官方形象繪製：灰圓身 + 頭帶「丸」牌 + 黃披風 + 黑火柴四肢） ================= */
+function mascot(size, mood){
+  var eyes = mood === 'wink'
+    ? '<path d="M31.5 44.5 q4 -4.4 8 0" stroke="#111111" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="55" cy="45" r="3.7" fill="#111111"/>'
+    : '<circle cx="35" cy="45" r="3.7" fill="#111111"/><circle cx="55" cy="45" r="3.7" fill="#111111"/>'
+      + '<circle cx="36.3" cy="43.6" r="1.25" fill="#ffffff"/><circle cx="56.3" cy="43.6" r="1.25" fill="#ffffff"/>';
+  return ''
+  + '<svg viewBox="0 0 90 90" width="'+size+'" height="'+size+'" xmlns="http://www.w3.org/2000/svg">'
+  +   '<defs>'
+  +     '<radialGradient id="mb" cx="36%" cy="28%" r="82%">'
+  +       '<stop offset="0%" stop-color="#CFC6BF"/><stop offset="60%" stop-color="#A79C94"/><stop offset="100%" stop-color="#847A73"/>'
+  +     '</radialGradient>'
+  +     '<linearGradient id="cp" x1="0" y1="0" x2="0" y2="1">'
+  +       '<stop offset="0%" stop-color="#F6C63C"/><stop offset="100%" stop-color="#DFA018"/>'
+  +     '</linearGradient>'
+  +   '</defs>'
+  /* 黃披風 */
+  +   '<path d="M23 42 C9 54 9 71 17 79 C23 71 25 61 27 55 Z" fill="url(#cp)" stroke="#111111" stroke-width="2.6" stroke-linejoin="round"/>'
+  +   '<path d="M67 42 C81 54 81 71 73 79 C67 71 65 61 63 55 Z" fill="url(#cp)" stroke="#111111" stroke-width="2.6" stroke-linejoin="round"/>'
+  /* 腿與腳 */
+  +   '<path d="M45 70 L37 77 M45 70 L53 77" stroke="#111111" stroke-width="3.4" stroke-linecap="round"/>'
+  +   '<ellipse cx="36" cy="79" rx="7.4" ry="4.4" fill="#111111"/>'
+  +   '<ellipse cx="54" cy="79" rx="7.4" ry="4.4" fill="#111111"/>'
+  /* 身體（灰圓丸） */
+  +   '<circle cx="45" cy="45" r="27" fill="url(#mb)" stroke="#111111" stroke-width="2.8"/>'
+  /* 頭帶 */
+  +   '<path d="M21 38 A 27 27 0 0 1 69 38" stroke="#111111" stroke-width="7" fill="none" stroke-linecap="round"/>'
+  +   '<path d="M23 37 C14 32 8 34 5 39 C11 40 17 42 21 45 Z" fill="#111111"/>'
+  /* 「丸」字金圓牌 */
+  +   '<circle cx="45" cy="27.5" r="9.4" fill="#F2C230" stroke="#111111" stroke-width="2.6"/>'
+  +   '<text x="45" y="33.2" text-anchor="middle" font-size="13" font-weight="700" fill="#C0392B" font-family="PingFang SC, Microsoft JhengHei, sans-serif">丸</text>'
+  /* 表情 */
+  +   eyes
+  +   '<ellipse cx="26" cy="54" rx="5" ry="3" fill="#E8917E" opacity=".6"/>'
+  +   '<ellipse cx="64" cy="54" rx="5" ry="3" fill="#E8917E" opacity=".6"/>'
+  +   '<path d="M38 55 q7 7 14 0" stroke="#111111" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
+  /* 火柴手 */
+  +   '<path d="M20 50 q-8 3 -9 10" stroke="#111111" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+  +   '<path d="M70 50 q8 3 9 10" stroke="#111111" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+  + '</svg>';
+}
+
+/* ================= 菜單資料 ================= */
+var MENU = {
+  A:[
+    {id:'a1',n:'招牌牛骨濃汁牛丸河',d:'振興牛骨濃汁牛丸 · 湯底熬足 6 小時',p:58,z:1},
+    {id:'a2',n:'潮式三寶湯麵',d:'牛丸 + 金牌墨魚丸 + 鮮味炸魚片',p:68,z:1},
+    {id:'a3',n:'金牌墨魚丸湯',d:'100% 新鮮墨魚 · 爽脆彈韌',p:52,z:1},
+    {id:'a4',n:'炸魚蛋（6 粒）',d:'即炸 · 配秘製甜醬',p:32,z:1},
+    {id:'a5',n:'炙燒芝心丸（4 粒）',d:'台式包心 · 一咬爆漿',p:38,z:1}
+  ],
+  B:[
+    {id:'b1',n:'淨牛丸湯（8 粒）',d:'原味清湯 · 想食幾多丸都得',p:46,z:1},
+    {id:'b2',n:'油菜（蠔油）',d:'每日新鮮時蔬',p:22,z:0},
+    {id:'b3',n:'白飯',d:'絲苗米',p:12,z:0}
+  ],
+  C:[
+    {id:'c1',n:'凍檸茶',d:'少冰 · 走甜可備註',p:20,z:0},
+    {id:'c2',n:'豆漿',d:'自家製 · 無添加',p:16,z:0}
+  ]
+};
+var CART = {}, TUE = true, PICK = null;
+var T58 = 58, T88 = 88;
+
+/* ================= 渲染 ================= */
+function money(v){ return v.toFixed(0); }
+
+function renderMenu(){
+  ['A','B','C'].forEach(function(k){
+    document.getElementById('list'+k).innerHTML = MENU[k].map(function(it){
+      var q = CART[it.id] || 0;
+      var badges = it.z ? '<span class="badge">振興供應</span>' : '';
+      if (it.z && TUE) badges += '<span class="plus">週二 +2 粒</span>';
+      return '<div class="item">'
+        + '<div class="thumb">' + (it.z ? mascot(46) : '<span style="font-size:22px">🍜</span>') + '</div>'
+        + '<div class="info">'
+        +   '<div class="name">' + it.n + badges + '</div>'
+        +   '<div class="desc">' + it.d + '</div>'
+        +   '<div class="row2">'
+        +     '<div class="price"><small>HK$</small>' + money(it.p) + '</div>'
+        +     '<div class="stepper">'
+        +       '<button onclick="chg(\''+it.id+'\',-1)">−</button>'
+        +       '<div class="qty'+(q?'':' zero')+'">'+q+'</div>'
+        +       '<button class="pri" onclick="chg(\''+it.id+'\',1)">+</button>'
+        +     '</div>'
+        +   '</div>'
+        + '</div></div>';
+    }).join('');
+  });
+}
+
+function totals(){
+  var sum = 0, n = 0;
+  Object.keys(CART).forEach(function(id){
+    var it = find(id); if(!it) return;
+    sum += it.p * CART[id]; n += CART[id];
+  });
+  return {sum:sum, n:n};
+}
+
+function find(id){
+  var all = MENU.A.concat(MENU.B, MENU.C);
+  for(var i=0;i<all.length;i++) if(all[i].id===id) return all[i];
+  return null;
+}
+
+function render(){
+  renderMenu();
+  var t = totals();
+  document.getElementById('tot').textContent = money(t.sum);
+  document.getElementById('cnt').textContent = t.n ? ('已選 '+t.n+' 件' + (TUE ? ' · 丸類已加量' : '')) : '未選擇餐點';
+  document.getElementById('payBtn').disabled = t.n === 0;
+
+  // 橫幅 / 進度：只在星期二顯示
+  document.getElementById('banner').style.display = TUE ? '' : 'none';
+  document.getElementById('gifts').style.display  = TUE ? '' : 'none';
+  if(TUE){
+    var goal = t.sum >= T88 ? 1 : (t.sum / T88);
+    document.getElementById('fill').style.width = Math.min(100, goal*100) + '%';
+    var ok58 = t.sum >= T58, ok88 = t.sum >= T88;
+    paint('g58', ok58, '$58'); paint('g88', ok88, '$88');
+    var left = Math.max(0, T88 - t.sum);
+    document.getElementById('giftHint').textContent = left > 0
+      ? ('仲差 $' + left + ' 就解鎖「丸侠」限量公仔')
+      : '已解鎖全部贈品，多謝支持！';
+  }
+}
+
+function paint(id, ok, amt){
+  var el = document.getElementById(id);
+  el.className = 'gift ' + (ok ? 'ok' : 'lock');
+  el.querySelector('.lv').textContent = ok ? '✓ 已解鎖' : '未解鎖';
+}
+
+function chg(id, d){
+  var q = (CART[id] || 0) + d;
+  if(q <= 0) delete CART[id]; else CART[id] = q;
+  render();
+}
+
+function setDay(isTue){
+  TUE = isTue;
+  document.getElementById('btnTue').className = isTue ? 'on' : '';
+  document.getElementById('btnDay').className = isTue ? '' : 'on';
+  closeSheet();
+  render();
+}
+
+/* ================= 結算 / 贈品 ================= */
+function openSheet(){ PICK = null; sheetGifts(); }
+function closeSheet(){ document.getElementById('mask').className = 'mask'; }
+
+function sheetGifts(){
+  var t = totals(), ok58 = t.sum >= T58, ok88 = t.sum >= T88;
+  var rows = '';
+  if(ok58){
+    rows += pick('frozen','急凍小分量牛丸 100g 兌換券',
+      '憑碼到大埔振興門市 / 官網 / App 兌換，有效期 30 日。凍品不佔用您現在的時間。');
+  }
+  if(ok88){
+    rows += pick('doll','限量「丸侠」公仔 1 隻','每店每日限量 20 隻，先到先得，送完即止。');
+  }
+  if(!rows){
+    rows = '<div class="gift lock" style="margin-bottom:10px"><span>未達贈品門檻，繼續加購即可解鎖。</span></div>';
+  }
+  document.getElementById('sheet').innerHTML =
+      '<h2>確認餐點</h2>'
+    + '<div class="sub">共 '+t.n+' 件　·　合計 HK$'+money(t.sum)+(TUE?'　·　丸類已加量 2 粒':'')+'</div>'
+    + (TUE ? ('<div style="font-size:12.5px;font-weight:700;margin:2px 0 8px">選擇贈品</div>' + rows) : '')
+    + '<button class="bigbtn" onclick="finish()">確認下單'+(TUE?'並領取贈品':'')+'</button>'
+    + '<button class="ghost" onclick="closeSheet()">返回修改</button>'
+    + '<div class="legal">示範畫面。贈品數量有限，送完即止；商戶保留最終決定權。</div>';
+  document.getElementById('mask').className = 'mask on';
+}
+
+function pick(k, title, desc){
+  return '<div class="pick'+(PICK===k?' sel':'')+'" onclick="choose(\''+k+'\')">'
+    + '<div class="t"><b>'+title+'</b><div>'+desc+'</div></div>'
+    + '<div class="radio"></div></div>';
+}
+function choose(k){ PICK = k; sheetGifts(); }
+
+function code(prefix){
+  var s = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', o = '';
+  for(var i=0;i<6;i++) o += s[Math.floor(Math.random()*s.length)];
+  return prefix + '-' + o;
+}
+
+function finish(){
+  var t = totals(), ok58 = t.sum >= T58, ok88 = t.sum >= T88;
+  var html = '<div class="done">'
+    + '<div class="tick">'+mascot(34,'wink')+'</div>'
+    + '<h2>落單成功</h2>'
+    + '<div class="sub">已送廚房　·　合計 HK$'+money(t.sum)+'</div></div>';
+
+  if(TUE && ok58){
+    html += '<div class="coupon"><div class="ct">急凍小分量牛丸 100g 兌換券</div>'
+      + '<div class="cd">憑券於大埔振興門市 / 官網 / App 兌換，有效期 30 日</div>'
+      + '<div class="code"><span>'+code('TPCH')+'</span><button onclick="cp(this)">複製</button></div></div>';
+  }
+  if(TUE && ok88){
+    html += '<div class="coupon"><div class="ct">限量「丸侠」公仔兌換券</div>'
+      + '<div class="cd">憑券向店員領取，每店每日 20 隻，送完即止</div>'
+      + '<div class="code"><span>'+code('MARBLE')+'</span><button onclick="cp(this)">複製</button></div></div>';
+  }
+  if(TUE){
+    html += '<div class="coupon" style="background:linear-gradient(135deg,#FBF6EE,#F6EDDD);border-color:#E3D6BC">'
+      + '<div class="ct" style="color:#7A6A57">掃碼即登記會員</div>'
+      + '<div class="cd">下次消費自動儲積分，可換振興急凍丸類</div></div>';
+  }
+  html += '<button class="bigbtn" onclick="reset()">完成</button>'
+       + '<div class="legal">示範畫面，不對應真實交易。贈品由大埔振興肉丸與合作商戶聯合提供。</div>';
+  document.getElementById('sheet').innerHTML = html;
+}
+
+function cp(btn){
+  var txt = btn.parentNode.querySelector('span').textContent;
+  if(navigator.clipboard) navigator.clipboard.writeText(txt);
+  btn.textContent = '已複製';
+  setTimeout(function(){ btn.textContent = '複製'; }, 1200);
+}
+
+function reset(){
+  CART = {}; PICK = null; closeSheet(); render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ================= init ================= */
+document.getElementById('mascotBig').innerHTML = mascot(104);
+render();
+</script>
+</body>
+</html>
