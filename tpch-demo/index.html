@@ -75,6 +75,7 @@
   .item{display:flex;gap:11px;margin:0 14px 9px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 12px}
   .thumb{width:54px;height:54px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center;
          background:#FBF6EE;border:1px solid var(--line);overflow:hidden}
+  .thumb svg{display:block}
   .info{flex:1;min-width:0}
   .name{font-size:14px;font-weight:650;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
   .badge{font-size:9.5px;font-weight:700;padding:2px 6px;border-radius:5px;background:#FDECEA;color:var(--brand);border:1px solid #F5C7C2;white-space:nowrap}
@@ -164,13 +165,13 @@
     </div>
   </header>
 
-  <!-- ============ 背書標識（可通用於所有合作店） ============ -->
-  <div class="seal">
+  <!-- ============ 背書標識（僅活動日顯示） ============ -->
+  <div class="seal" id="sealRow">
     <div class="stamp"><b>振興</b><span>SUPPLY</span></div>
     <div class="txt">本店丸類由 <b>大埔振興肉丸</b> 供應　·　1967 年創立　·　百分百牛肉</div>
   </div>
 
-  <!-- ============ 活動橫幅 ============ -->
+  <!-- ============ 活動橫幅（僅活動日顯示） ============ -->
   <div class="banner" id="banner">
     <div class="kicker">TUESDAY ONLY · 逢二限定</div>
     <h1>丸事星期二</h1>
@@ -179,7 +180,7 @@
     <div class="mascot" id="mascotBig"></div>
   </div>
 
-  <!-- ============ 贈品進度 ============ -->
+  <!-- ============ 贈品進度（僅活動日顯示） ============ -->
   <div class="gifts" id="gifts">
     <h2>今日贈品進度</h2>
     <div class="hint" id="giftHint">仲差 $88 就解鎖「丸侠」限量公仔</div>
@@ -202,7 +203,7 @@
   </div>
 
   <!-- ============ 菜單 ============ -->
-  <div class="cat">振興丸類 · 招牌</div>
+  <div class="cat" id="catA">振興丸類 · 招牌</div>
   <div id="listA"></div>
 
   <div class="cat">湯麵 · 主食</div>
@@ -211,7 +212,7 @@
   <div class="cat">飲品 · 小食</div>
   <div id="listC"></div>
 
-  <div class="note">
+  <div class="note" id="noteRow">
     <b>「丸事星期二」</b>為大埔振興肉丸與合作餐廳之聯合推廣活動。<br>
     贈品每日限量，送完即止；兌換券有效期 30 日，可於大埔振興門市、官網或 App 使用。
   </div>
@@ -277,10 +278,94 @@ function mascot(size, mood){
   + '</svg>';
 }
 
+/* ================= 平日：虛擬菜品圖（純 SVG，離線可用） ================= */
+function ball(cx, cy, r, fill, stroke){
+  return '<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="'+fill+'"'
+       + (stroke ? ' stroke="'+stroke+'" stroke-width="1"' : '') + '/>'
+       + '<circle cx="'+(cx - r*0.34).toFixed(1)+'" cy="'+(cy - r*0.34).toFixed(1)+'" r="'+(r*0.3).toFixed(1)+'" fill="#FFFFFF" opacity=".42"/>';
+}
+function bowlBase(soupFill){
+  return '<ellipse cx="27" cy="24" rx="17" ry="5.8" fill="#FFFDF8" stroke="#D8C9B4" stroke-width="1.4"/>'
+       + '<path d="M10 24 C11 39 18 44 27 44 C36 44 43 39 44 24 Z" fill="#FFFDF8" stroke="#D8C9B4" stroke-width="1.4"/>'
+       + '<ellipse cx="27" cy="24" rx="14" ry="4.2" fill="'+soupFill+'"/>';
+}
+function noodle(){
+  return '<path d="M16 23 q5 -2.2 10 -.4" stroke="#F4E7CB" stroke-width="1.3" fill="none" stroke-linecap="round"/>'
+       + '<path d="M23 26 q6 -2.2 12 -.4" stroke="#F4E7CB" stroke-width="1.3" fill="none" stroke-linecap="round"/>';
+}
+function plate(){
+  return '<ellipse cx="27" cy="35" rx="18.5" ry="5.8" fill="#F3EBDE" stroke="#D8C9B4" stroke-width="1.3"/>';
+}
+
+var ART = {
+  /* 招牌牛骨濃汁牛丸河 */
+  a1: bowlBase('#E8D8BC') + noodle()
+    + ball(20, 21.6, 4.4, '#8C5A3C') + ball(29.6, 20.8, 4.4, '#8C5A3C') + ball(24.6, 25.9, 4.4, '#8C5A3C'),
+  /* 潮式三寶湯麵（牛丸＋墨魚丸＋炸魚片） */
+  a2: bowlBase('#E8D8BC') + noodle()
+    + ball(20, 21.6, 4.4, '#8C5A3C') + ball(29.6, 20.8, 4.4, '#F6F1E8', '#DDD3C4') + ball(24.6, 25.9, 4.4, '#E3AC3E', '#C98F28'),
+  /* 金牌墨魚丸湯 */
+  a3: bowlBase('#E8D8BC')
+    + ball(20, 22, 4.4, '#F6F1E8', '#DDD3C4') + ball(29.4, 21, 4.4, '#F6F1E8', '#DDD3C4') + ball(24.6, 26.2, 4.4, '#F6F1E8', '#DDD3C4'),
+  /* 炸魚蛋（6 粒） */
+  a4: plate()
+    + ball(19, 29, 4.6, '#E3AC3E', '#C98F28') + ball(28, 27, 4.6, '#EDBB55', '#C98F28')
+    + ball(36, 30, 4.6, '#E3AC3E', '#C98F28') + ball(23.5, 35, 4.6, '#EDBB55', '#C98F28')
+    + ball(32.5, 35, 4.6, '#E3AC3E', '#C98F28') + ball(27, 21.5, 4.2, '#EDBB55', '#C98F28'),
+  /* 炙燒芝心丸（4 粒） */
+  a5: plate()
+    + '<path d="M17.5 25.5 q3.5 -1.6 7 0" stroke="#B07C3C" stroke-width="1.3" fill="none" stroke-linecap="round"/>'
+    + '<path d="M28 33.6 q3.5 -1.6 7 0" stroke="#B07C3C" stroke-width="1.3" fill="none" stroke-linecap="round"/>'
+    + ball(20, 29, 5, '#E9C89B', '#C9A162') + ball(30.5, 27, 5, '#E9C89B', '#C9A162')
+    + ball(25, 35, 5, '#E9C89B', '#C9A162') + ball(36, 34, 4.6, '#E9C89B', '#C9A162')
+    + '<circle cx="20" cy="29" r="1.9" fill="#FFF6E0"/><circle cx="30.5" cy="27" r="1.9" fill="#FFF6E0"/>'
+    + '<circle cx="25" cy="35" r="1.9" fill="#FFF6E0"/><circle cx="36" cy="34" r="1.7" fill="#FFF6E0"/>',
+  /* 淨牛丸湯（8 粒） */
+  b1: bowlBase('#E8D8BC')
+    + ball(17.5, 21.6, 3.3, '#8C5A3C') + ball(23.2, 20.6, 3.3, '#8C5A3C') + ball(28.9, 20.6, 3.3, '#8C5A3C') + ball(34.6, 21.6, 3.3, '#8C5A3C')
+    + ball(20, 25.9, 3.3, '#8C5A3C') + ball(25.6, 26.8, 3.3, '#8C5A3C') + ball(31.2, 26.8, 3.3, '#8C5A3C') + ball(36.8, 25.9, 3.3, '#8C5A3C'),
+  /* 油菜（蠔油） */
+  b2: plate()
+    + '<path d="M22 34 C17 30 14 24 16 17.5 C22 20 25 26 24.5 33 Z" fill="#5E9E58"/>'
+    + '<path d="M32 34 C37 30 40 24 38 17.5 C32 20 29 26 29.5 33 Z" fill="#6BAF63"/>'
+    + '<path d="M27 34.5 C24 30.5 23 24.5 25 18.5 C29 21.5 30.5 27.5 29.5 33.5 Z" fill="#7CBF70"/>'
+    + '<path d="M20 34 q7 3 14 0" stroke="#8B5A2B" stroke-width="1.8" fill="none" stroke-linecap="round"/>',
+  /* 白飯 */
+  b3: '<ellipse cx="27" cy="25" rx="17" ry="5.8" fill="#FFFDF8" stroke="#D8C9B4" stroke-width="1.4"/>'
+    + '<path d="M10 25 C11 40 18 45 27 45 C36 45 43 40 44 25 Z" fill="#FFFDF8" stroke="#D8C9B4" stroke-width="1.4"/>'
+    + '<path d="M16 25 C18 15.5 36 15.5 38 25 Z" fill="#FFFFFF" stroke="#E4DBCE" stroke-width="1.2"/>'
+    + '<path d="M20 21.5 q7 -3 14 0" stroke="#F1EFE8" stroke-width="1.2" fill="none"/>',
+  /* 凍檸茶 */
+  c1: '<path d="M18 13 h18 l-2.4 29 a3 3 0 0 1 -3 2.7 h-7.2 a3 3 0 0 1 -3 -2.7 Z" fill="#FFFDF6" stroke="#D9C9AF" stroke-width="1.4"/>'
+    + '<path d="M19.8 21 h14.4 l-2 21 a2 2 0 0 1 -2 1.8 h-6.4 a2 2 0 0 1 -2 -1.8 Z" fill="#C4813A"/>'
+    + '<rect x="22" y="24" width="5" height="5" rx="1.2" fill="#FFFFFF" opacity=".45"/>'
+    + '<rect x="28.6" y="28.5" width="4.4" height="4.4" rx="1.1" fill="#FFFFFF" opacity=".4"/>'
+    + '<circle cx="27" cy="35" r="6" fill="#F0CE45" stroke="#D3AC2C" stroke-width="1"/>'
+    + '<path d="M27 29.4 v11.2 M21.4 35 h11.2" stroke="#D3AC2C" stroke-width="1" opacity=".85"/>',
+  /* 豆漿 */
+  c2: '<path d="M19 15 h16 l-2.2 27 a3 3 0 0 1 -3 2.7 h-5.6 a3 3 0 0 1 -3 -2.7 Z" fill="#FFFDF6" stroke="#D9C9AF" stroke-width="1.4"/>'
+    + '<ellipse cx="27" cy="17.6" rx="7.6" ry="2.6" fill="#F6EFDF" stroke="#E2D6C2" stroke-width="1"/>'
+    + '<circle cx="24" cy="30" r="1.4" fill="#EDE3D0"/><circle cx="29.4" cy="24" r="1.1" fill="#EDE3D0"/>'
+    + '<circle cx="26.4" cy="37" r="1.2" fill="#EDE3D0"/>'
+};
+
+function dishArt(id){
+  var inner = ART[id] || bowlBase('#E8D8BC');
+  return '<svg viewBox="0 0 54 54" width="54" height="54" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true">'
+       + '<rect width="54" height="54" fill="#FBF6EE"/>' + inner + '</svg>';
+}
+
+/* 縮圖：活動日 → 振興丸類用丸侠、其他用湯麵；平日 → 一律用品名對應的菜品圖 */
+function thumb(it){
+  if (TUE) return it.z ? mascot(46) : '<span style="font-size:22px">🍜</span>';
+  return dishArt(it.id);
+}
+
 /* ================= 菜單資料 ================= */
+/* dOff = 平日版描述（去品牌字眼）；無 dOff 者平日沿用 d */
 var MENU = {
   A:[
-    {id:'a1',n:'招牌牛骨濃汁牛丸河',d:'振興牛骨濃汁牛丸 · 湯底熬足 6 小時',p:58,z:1},
+    {id:'a1',n:'招牌牛骨濃汁牛丸河',d:'振興牛骨濃汁牛丸 · 湯底熬足 6 小時',dOff:'牛骨濃汁牛丸 · 湯底熬足 6 小時',p:58,z:1},
     {id:'a2',n:'潮式三寶湯麵',d:'牛丸 + 金牌墨魚丸 + 鮮味炸魚片',p:68,z:1},
     {id:'a3',n:'金牌墨魚丸湯',d:'100% 新鮮墨魚 · 爽脆彈韌',p:52,z:1},
     {id:'a4',n:'炸魚蛋（6 粒）',d:'即炸 · 配秘製甜醬',p:32,z:1},
@@ -306,13 +391,15 @@ function renderMenu(){
   ['A','B','C'].forEach(function(k){
     document.getElementById('list'+k).innerHTML = MENU[k].map(function(it){
       var q = CART[it.id] || 0;
-      var badges = it.z ? '<span class="badge">振興供應</span>' : '';
+      /* 「振興供應」徽章只在活動日出現 */
+      var badges = (TUE && it.z) ? '<span class="badge">振興供應</span>' : '';
       if (it.z && TUE) badges += '<span class="plus">週二 +2 粒</span>';
+      var dTxt = (!TUE && it.dOff) ? it.dOff : it.d;
       return '<div class="item">'
-        + '<div class="thumb">' + (it.z ? mascot(46) : '<span style="font-size:22px">🍜</span>') + '</div>'
+        + '<div class="thumb">' + thumb(it) + '</div>'
         + '<div class="info">'
         +   '<div class="name">' + it.n + badges + '</div>'
-        +   '<div class="desc">' + it.d + '</div>'
+        +   '<div class="desc">' + dTxt + '</div>'
         +   '<div class="row2">'
         +     '<div class="price"><small>HK$</small>' + money(it.p) + '</div>'
         +     '<div class="stepper">'
@@ -341,6 +428,12 @@ function find(id){
   return null;
 }
 
+/* 活動日 / 平日 兩套頁面文案 */
+var COPY = {
+  tue: { title:'掃碼點餐 · 丸事星期二｜大埔振興肉丸', catA:'振興丸類 · 招牌' },
+  day: { title:'掃碼點餐 · 發記潮式粉麵',           catA:'菜單' }
+};
+
 function render(){
   renderMenu();
   var t = totals();
@@ -348,7 +441,13 @@ function render(){
   document.getElementById('cnt').textContent = t.n ? ('已選 '+t.n+' 件' + (TUE ? ' · 丸類已加量' : '')) : '未選擇餐點';
   document.getElementById('payBtn').disabled = t.n === 0;
 
-  // 橫幅 / 進度：只在星期二顯示
+  /* 平日：頁面上不得出現任何品牌（振興）相關內容 */
+  document.title = TUE ? COPY.tue.title : COPY.day.title;
+  document.getElementById('catA').textContent  = TUE ? COPY.tue.catA : COPY.day.catA;
+  document.getElementById('sealRow').style.display = TUE ? '' : 'none';
+  document.getElementById('noteRow').style.display = TUE ? '' : 'none';
+
+  /* 橫幅 / 進度：只在星期二顯示 */
   document.getElementById('banner').style.display = TUE ? '' : 'none';
   document.getElementById('gifts').style.display  = TUE ? '' : 'none';
   if(TUE){
@@ -390,14 +489,16 @@ function closeSheet(){ document.getElementById('mask').className = 'mask'; }
 function sheetGifts(){
   var t = totals(), ok58 = t.sum >= T58, ok88 = t.sum >= T88;
   var rows = '';
-  if(ok58){
-    rows += pick('frozen','急凍小分量牛丸 100g 兌換券',
-      '憑碼到大埔振興門市 / 官網 / App 兌換，有效期 30 日。凍品不佔用您現在的時間。');
+  if(TUE){
+    if(ok58){
+      rows += pick('frozen','急凍小分量牛丸 100g 兌換券',
+        '憑碼到大埔振興門市 / 官網 / App 兌換，有效期 30 日。凍品不佔用您現在的時間。');
+    }
+    if(ok88){
+      rows += pick('doll','限量「丸侠」公仔 1 隻','每店每日限量 20 隻，先到先得，送完即止。');
+    }
   }
-  if(ok88){
-    rows += pick('doll','限量「丸侠」公仔 1 隻','每店每日限量 20 隻，先到先得，送完即止。');
-  }
-  if(!rows){
+  if(TUE && !rows){
     rows = '<div class="gift lock" style="margin-bottom:10px"><span>未達贈品門檻，繼續加購即可解鎖。</span></div>';
   }
   document.getElementById('sheet').innerHTML =
@@ -406,7 +507,9 @@ function sheetGifts(){
     + (TUE ? ('<div style="font-size:12.5px;font-weight:700;margin:2px 0 8px">選擇贈品</div>' + rows) : '')
     + '<button class="bigbtn" onclick="finish()">確認下單'+(TUE?'並領取贈品':'')+'</button>'
     + '<button class="ghost" onclick="closeSheet()">返回修改</button>'
-    + '<div class="legal">示範畫面。贈品數量有限，送完即止；商戶保留最終決定權。</div>';
+    + '<div class="legal">' + (TUE
+        ? '示範畫面。贈品數量有限，送完即止；商戶保留最終決定權。'
+        : '示範畫面，不對應真實交易。') + '</div>';
   document.getElementById('mask').className = 'mask on';
 }
 
@@ -446,7 +549,9 @@ function finish(){
       + '<div class="cd">下次消費自動儲積分，可換振興急凍丸類</div></div>';
   }
   html += '<button class="bigbtn" onclick="reset()">完成</button>'
-       + '<div class="legal">示範畫面，不對應真實交易。贈品由大埔振興肉丸與合作商戶聯合提供。</div>';
+       + '<div class="legal">' + (TUE
+           ? '示範畫面，不對應真實交易。贈品由大埔振興肉丸與合作商戶聯合提供。'
+           : '示範畫面，不對應真實交易。') + '</div>';
   document.getElementById('sheet').innerHTML = html;
 }
 
