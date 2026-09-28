@@ -1,17 +1,21 @@
-# Acadamic
+# 大埔振興 × 丸事星期二 — 課業示範頁
 
-課業專案頁面。
+Marketing Communications（MRTG2300）小組專案之課業示範。所有頁面僅供課業討論使用，
+**不對應任何真實交易**。
 
-## 大埔振興 × 丸事星期二 · 掃碼點餐示範
+## 頁面
 
-- 示範頁：https://kevinwen1874-cell.github.io/Acadamic/tpch-demo/
-- 二維碼頁：https://kevinwen1874-cell.github.io/Acadamic/tpch-demo/qr.html
-
-合作食肆掃碼點餐的活動機制示範（星期二加量 + 滿額贈品），純課業演示，非真實交易系統。
-示範頁頂部可切換「星期二（活動中）」與「平日」：平日版本為一般點餐頁，不含任何品牌推廣內容。
-
-| 檔案 | 說明 |
+| 路徑 | 說明 |
 | --- | --- |
-| `tpch-demo/index.html` | 掃碼點餐示範頁，可切換活動日 / 平日 |
-| `tpch-demo/qr.html` | 二維碼顯示頁，可列印或下載 PNG |
-| `tpch-demo/qr.png` / `qr.svg` | 二維碼圖檔 |
+| `/` | 落地頁 |
+| `/tpch-pos-demo/` | 點餐系統對照：實際系統 vs 我們建議的版本（可切換），含 9 項更新建議 |
+| `/tpch-demo/` | 丸事星期二掃碼點餐示範頁（星期二 / 平日對照） |
+| `/tpch-demo/qr.html` | 二維碼圖頁 |
+
+## 資料來源
+
+`/tpch-pos-demo/` 之菜單（99 品項 / 14 分類）、價格、售罄狀態、規格彈窗分組、
+套餐彈窗分組與菜品照片，均取自門店現行點餐系統的實機頁面快照（2026-09-28）。
+框架為 ag-pos takeawaypayV2（Framework7 + Vue），示範頁依原結構重建，樣式取原系統 CSS 變數。
+
+`/tpch-demo/` 為推廣活動機制的構想示範。

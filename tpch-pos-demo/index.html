@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>大埔振興肉丸麵 · 掃碼點餐｜實際 vs 理想</title>
+<style>
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:#dfe3e8;font-family:-apple-system,"PingFang HK","PingFang SC","Microsoft JhengHei",system-ui,sans-serif;color:#111}
+  .page{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
+
+  /* ===== 顶部：模式切换 ===== */
+  .topbar{background:#1f1f22;color:#fff;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .topbar h1{font-size:16px;margin:0;font-weight:700;letter-spacing:.4px}
+  .topbar .sub{font-size:11.5px;color:#9aa0a6;margin-top:3px}
+  .seg{margin-left:auto;display:flex;background:#33343a;border-radius:999px;padding:3px}
+  .seg button{border:0;background:transparent;color:#c9ccd1;font:inherit;font-size:13px;font-weight:600;padding:8px 18px;border-radius:999px;cursor:pointer}
+  .seg button.on{background:#ffa500;color:#1b1b1b}
+  .seg button.on.ideal{background:#c0392b;color:#fff}
+
+  .stage{display:flex;gap:22px;align-items:flex-start;margin-top:20px;flex-wrap:wrap;justify-content:center}
+
+  /* ===== 手机框 ===== */
+  .phone{width:392px;height:790px;background:#fff;border-radius:26px;overflow:hidden;position:relative;
+         box-shadow:0 18px 48px rgba(0,0,0,.28);flex:none;display:flex;flex-direction:column}
+  /* viewport 必须是纵向 flex，.body{flex:1} 才能拿到有界高度，右栏才可滚动 */
+  .phone .viewport{flex:1;position:relative;overflow:hidden;background:#fff;
+        display:flex;flex-direction:column}
+  .phone .viewport > .hd,.phone .viewport > .searchwrap,.phone .viewport > .brand,
+  .phone .viewport > .act,.phone .viewport > .gifts{flex:none}
+
+  /* ---- 启动弹窗（真实系统存在：launch-popup + 前往點餐(5s)） ---- */
+  .launch{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:center;justify-content:center;padding:26px}
+  .launch .box{background:#fff;border-radius:12px;padding:18px;width:100%;text-align:center;position:relative}
+  .launch .art{width:100%;aspect-ratio:9/16;max-height:420px;border-radius:8px;overflow:hidden;background:#ededf2;
+        display:flex;align-items:center;justify-content:center}
+  .launch a.go{display:inline-block;margin-top:14px;color:#e2352b;font-size:15px;font-weight:700;text-decoration:none}
+  .launch .adnote{font-size:11px;color:#9aa0a6;margin-top:6px}
+
+  /* ---- 顶部信息区（真实：白底 100px，两行） ---- */
+  .hd{background:#fff;padding:0 10px}
+  .hd .r1{height:50px;display:flex;align-items:center}
+  .hd .r1 .ic{display:flex;gap:6px;flex:0 0 33%;align-items:center}
+  .hd .r1 .ic.r{justify-content:flex-end}
+  .hd .r1 .nm{flex:1;text-align:center;font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ibtn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:6px;background:transparent;border:0;cursor:pointer;color:#ffa500}
+  .ibtn.solid{background:#ffa500;color:#fff}
+  .ibtn svg{width:21px;height:21px;display:block}
+  .hd .r2{height:50px;display:flex;align-items:center;font-size:13px;gap:8px}
+  .hd .r2 .din{width:30px;text-align:center;color:#ffa500;line-height:1.05}
+  .hd .r2 .din svg{width:20px;height:20px}
+  .hd .r2 .din span{display:block;font-size:10px;color:#111}
+  .hd .r2 .meta{line-height:1.42}
+  .hd .r2 .meta b{font-weight:400}
+  .hd .r2 .meta svg{width:13px;height:13px;vertical-align:-2px;margin-right:1px}
+  .hd .r2 .t{font-size:11px;color:#444}
+  .hd .r2 .cancel{margin-left:auto;font-size:12.5px;color:#888;background:none;border:0;cursor:pointer;padding:6px 4px}
+
+  .searchwrap{padding:0 10px 8px;background:#fff}
+  .searchwrap input{width:100%;height:34px;border-radius:17px;border:1px solid #e2e2e2;background:#f5f5f5;
+        padding:0 14px 0 32px;font:inherit;font-size:13px;outline:none}
+  .searchwrap .sw{position:relative}
+  .searchwrap .sw svg{position:absolute;left:11px;top:9px;width:16px;height:16px;color:#999}
+  .hot{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+  .hot button{border:1px solid #f0d9a3;background:#fff8ea;color:#9a6b12;font:inherit;font-size:11.5px;
+        padding:3px 9px;border-radius:999px;cursor:pointer}
+
+  /* ---- 理想版：品牌背书条 / 活动横幅 / 赠品进度 ---- */
+  .brand{display:flex;align-items:center;gap:8px;background:#fffdf8;border-top:1px solid #eee;border-bottom:1px solid #eee;
+        padding:7px 12px;font-size:11.5px;color:#6b5b47}
+  .brand .st{flex:none;width:28px;height:28px;border:1.4px solid #c0392b;border-radius:6px;color:#c0392b;
+        display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+  .brand .st b{font-size:10px}
+  .brand .st i{font-size:6.5px;font-style:normal;letter-spacing:.4px;margin-top:1px}
+  .brand .tx b{color:#96291f}
+
+  .act{margin:8px 10px 0;border-radius:10px;background:linear-gradient(135deg,#c0392b,#96291f);color:#fff;padding:10px 12px;position:relative;overflow:hidden}
+  .act .k{font-size:9.5px;letter-spacing:1.6px;opacity:.85}
+  .act h3{margin:2px 0 3px;font-size:17px;font-weight:800}
+  .act p{margin:0;font-size:11.5px;opacity:.95;line-height:1.45;max-width:76%}
+  .act .m{position:absolute;right:4px;bottom:-8px;width:74px;height:74px;pointer-events:none}
+
+  .gifts{margin:8px 10px 0;border:1px solid #eee;border-radius:10px;padding:9px 11px;background:#fff}
+  .gifts .gt{font-size:12px;font-weight:700}
+  .gifts .gh{font-size:10.5px;color:#8a7e70;margin:1px 0 7px}
+  .track{height:7px;background:#f0eae1;border-radius:99px;overflow:hidden}
+  .fill{height:100%;width:0;background:linear-gradient(90deg,#e8a33d,#c0392b);transition:width .35s}
+  .gifts .rows{margin-top:7px;display:grid;gap:5px}
+  .gifts .g{display:flex;align-items:center;gap:7px;font-size:11px;padding:5px 8px;border-radius:7px;background:#fbf8f3;border:1px dashed #eee}
+  .gifts .g.ok{background:#f3faf5;border:1px solid #bfe3cc}
+  .gifts .g b{color:#96291f;font-size:11px}
+  .gifts .g em{margin-left:auto;font-style:normal;font-weight:700;font-size:10.5px;color:#8a7e70}
+  .gifts .g.ok em{color:#2e7d52}
+
+  /* ---- 主体：左分类 + 右菜品（真实：col-25 / col-75） ---- */
+  .body{flex:1;display:flex;min-height:0;overflow:hidden;border-top:1px solid #eee}
+  .cats{width:25%;background:#f2f2f2;overflow-y:auto;flex:none;-webkit-overflow-scrolling:touch}
+  .cats .c{padding:15px 0;margin:0 8px;text-align:center;font-size:12.5px;line-height:1.25;color:#000;
+        border-bottom:1px solid #dedede;cursor:pointer;position:relative}
+  .cats .c.on{background:#fff;box-shadow:inset 3px 0 0 #fea735;font-weight:700;border-radius:3px}
+  .cats .c .tag{position:absolute;top:6px;right:3px;background:#c0392b;color:#fff;font-size:8px;font-weight:700;
+        padding:1px 4px;border-radius:6px;line-height:1.35}
+  .cats .c .pin{position:absolute;top:4px;left:4px;font-size:8.5px;color:#c0392b;font-weight:700}
+  .items{width:75%;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#fff}
+  .grp{background:#f5f5f5;padding:7px 10px;position:sticky;top:0;z-index:5;display:flex;align-items:baseline}
+  .grp .t{font-size:14px;font-weight:700;color:#000}
+  .grp .s{margin-left:auto;font-size:11px;color:#cd5c5c}
+  .it{display:flex;flex-wrap:wrap;padding:10px 5px;border-bottom:1px solid #eee;position:relative}
+  .it .nm{width:66%;padding-right:4px;cursor:pointer}
+  .it .ph{cursor:pointer}
+  .it .alt{width:100%;margin-top:5px;font-size:10.5px;color:#2e7d52;background:#f3faf5;
+        border:1px solid #bfe3cc;border-radius:5px;padding:3px 7px}
+  .it .nm strong{font-size:14px;font-weight:700;line-height:1.32;display:block}
+  .it .nm .sub{font-size:10.5px;color:#999;margin-top:3px}
+  .it .ph{width:30%;margin-left:auto}
+  .it .ph .fr{position:relative;width:100%;aspect-ratio:1/1;border:1px solid #ddd;border-radius:5px;overflow:hidden;background:#fafafa}
+  .it .ph img{width:100%;height:100%;object-fit:cover;display:block}
+  .it .ph .noimg{width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+        background:#f3f3f3;color:#cfcfcf;font-size:26px;font-weight:800}
+  .it .ph .noimg.brand{background:#fdf6f4;color:#e3c0b8}
+  .it .prow{width:100%;display:flex;align-items:center;margin-top:6px}
+  .it .pr{font-size:16px;font-weight:700;color:#ffa500}
+  .it .pr small{font-size:11px}
+  .it .ord{margin-left:auto;display:flex;align-items:center;gap:0}
+  .it .ord .cnt{font-size:14px;padding:0 6px;min-width:20px;text-align:center}
+  .it .ord .rb{width:28px;height:28px;border-radius:5px;background:#ffa500;color:#fff;border:0;cursor:pointer;
+        font-size:20px;line-height:26px;font-weight:400;display:flex;align-items:center;justify-content:center}
+  .it .ord .rb.del{background:#ffa500}
+  .it .ord .rb svg{width:15px;height:15px}
+  .it.sold .nm strong,.it.sold .pr{color:#aaa}
+  .it.sold .ph .fr{opacity:.55}
+  .lbl{font-size:10.5px;color:#fff;background:#777;border-radius:4px;padding:1px 6px;margin-left:6px;vertical-align:2px}
+  .lbl.soon{background:#8a7e70}
+  .lbl.ideal{background:#c0392b}
+  .it .addon{width:100%;margin-top:5px;font-size:10.5px;color:#9a6b12;background:#fff8ea;border:1px solid #f0d9a3;
+        border-radius:5px;padding:3px 7px;display:inline-block}
+
+  /* ---- 底部工具条（真实：#474747 + 圆形购物车 + 賬單記錄/下單） ---- */
+  .toolbar{height:60px;background:#474747;position:relative;display:flex;align-items:center;padding-left:86px;padding-right:10px;flex:none}
+  .cartbtn{position:absolute;left:15px;bottom:5px;width:60px;height:55px;border-radius:50%;background:#fff;
+        border:2px solid #ffa500;display:flex;align-items:center;justify-content:center;cursor:pointer;padding-bottom:5px}
+  .cartbtn svg{width:28px;height:28px;color:#ffa500;margin-top:-5px}
+  .cartbtn .badge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;border-radius:10px;background:#c0392b;color:#fff;
+        font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 5px}
+  .cartbtn .amt{position:absolute;bottom:-3px;left:50%;transform:translateX(-50%);font-size:10px;font-weight:700;color:#c0392b;white-space:nowrap}
+  .toolbar .btns{margin-left:auto;display:flex;width:60%}
+  .toolbar .btns a{flex:1;height:44px;display:flex;align-items:center;justify-content:center;color:#fff;
+        font-size:14px;font-weight:600;text-decoration:none;border-radius:5px;cursor:pointer}
+  .toolbar .btns .bill{background:#ff2246}
+  .toolbar .btns .order{background:#ddd;color:#9b9b9b;margin-left:6px}
+  .toolbar .btns .order.act{background:#ffa500;color:#fff}
+  .toolbar .hint{position:absolute;left:86px;right:10px;top:6px;font-size:10px;color:#c9c9c9}
+
+  /* ---- 弹层 ---- */
+  .mask{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:70;display:none;align-items:flex-end}
+  .mask.on{display:flex}
+  .sheet{width:100%;background:#fff;border-radius:14px 14px 0 0;max-height:88%;overflow-y:auto;padding:16px 14px 20px;animation:up .24s ease}
+  @keyframes up{from{transform:translateY(18px);opacity:.5}to{transform:none;opacity:1}}
+  .sheet h3{margin:0 0 3px;font-size:16px}
+  .sheet .s{font-size:11.5px;color:#8a7e70;margin-bottom:12px}
+  .sheet .li{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #f2f2f2;font-size:13px}
+  .sheet .li .l{flex:1}
+  .sheet .li .l em{display:block;font-style:normal;font-size:11px;color:#999;margin-top:2px;line-height:1.4}
+  .sheet .li .r{text-align:right;white-space:nowrap;font-weight:600}
+  .sheet .li .q{color:#999;font-weight:400;font-size:11.5px}
+  .sheet .tot{display:flex;align-items:center;margin:14px 0 10px;font-size:15px;font-weight:700}
+  .sheet .tot .v{margin-left:auto;color:#ffa500;font-size:19px}
+  .sheet .big{width:100%;border:0;border-radius:8px;background:#ffa500;color:#fff;font:inherit;font-size:15px;
+        font-weight:700;padding:13px;cursor:pointer}
+  .sheet .ghost{width:100%;border:0;background:transparent;color:#8a7e70;font:inherit;font-size:13px;padding:10px;cursor:pointer}
+  .sheet .empty{font-size:13px;color:#8a7e70;padding:16px 0;text-align:center}
+  .sheet .li .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:5px}
+  .sheet .li .tags i{font-style:normal;font-size:10.5px;color:#6b6b6b;background:#f4f4f4;
+        border-radius:3px;padding:2px 6px;white-space:nowrap}
+  .sheet .li .tags i b{color:#c0392b}
+  .sheet .legal{font-size:10.5px;color:#aaa;text-align:center;margin-top:10px;line-height:1.6}
+
+  /* ---- 规格弹窗 / 套餐弹窗（真实：attPopup + setMeal） ---- */
+  .attpop{position:absolute;inset:0;background:#fff;z-index:80;display:none;flex-direction:column}
+  .attpop.on{display:flex}
+  .attpop .nav{height:44px;flex:none;display:flex;align-items:center;gap:8px;padding:0 10px;
+        background:#fff;border-bottom:1px solid #eee;position:relative;z-index:3}
+  .attpop .nav .bk{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.85);border:0;
+        color:#ff9500;font-size:24px;line-height:1;cursor:pointer;display:flex;align-items:center;
+        justify-content:center;padding-bottom:3px}
+  .attpop .nav .nm{font-size:14px;font-weight:600;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .attpop .nav .pr{color:#ff9500;font-weight:700;font-size:15px}
+  .attpop .content{flex:1;overflow-y:auto;background:#f7f7f7;-webkit-overflow-scrolling:touch}
+  .attpop .hero{width:100%;aspect-ratio:4/3;overflow:hidden;background:#ececec}
+  .attpop .hero img{width:100%;height:100%;object-fit:cover;display:block}
+  .attpop .hero.noimg{display:flex;align-items:center;justify-content:center;background:#f3f3f3;
+        color:#dcdcdc;font-size:70px;font-weight:800}
+  .attpop .card{margin:-30px 8px 0;background:#fff;border:1px solid #eee;border-radius:8px;
+        padding:10px 12px;position:relative;z-index:2}
+  .attpop .card h3{margin:0;font-size:15px;line-height:1.4}
+  .attpop .card .pi{margin-top:7px}
+  .attpop .card .pi .k{font-size:11px;color:#999}
+  .attpop .card .pi b{color:#ff9500;font-size:15px}
+  .attpop .twb{margin:8px;border-radius:8px;background:linear-gradient(135deg,#c0392b,#96291f);color:#fff;
+        padding:9px 11px;font-size:11.5px;line-height:1.5;display:flex;align-items:center;gap:8px}
+  .attpop .twb b{font-size:13px}
+  .attpop .twb svg{flex:none}
+  .attpop .glist{margin:8px;background:#fff;border-radius:8px;overflow:hidden}
+  .attpop .g{border-bottom:1px solid #f4f4f4}
+  .attpop .g:last-child{border-bottom:0}
+  .attpop .gt{display:flex;align-items:center;gap:6px;padding:11px 12px 9px}
+  .attpop .gt .m{flex:1;min-width:0}
+  .attpop .gt .m em{font-style:normal;font-size:11.5px;color:#333}
+  .attpop .gt .m .nm{font-size:12.5px;font-weight:700;margin-left:4px}
+  .attpop .gt .m .mx{font-size:10.5px;color:#8a8a8a;margin-top:3px}
+  .attpop .gt .must{flex:none;font-size:10.5px;color:#c0392b;border:1px solid #e8b3ac;border-radius:4px;padding:1px 5px}
+  .attpop .gt .opt{flex:none;font-size:10.5px;color:#454545;border:1px solid #e0e0e0;border-radius:4px;padding:1px 5px}
+  .attpop .os{padding:0 12px 8px}
+  .attpop .o{display:flex;align-items:center;gap:9px;padding:9px 0;border-top:1px dashed #f2f2f2;
+        font-size:13px;cursor:pointer;line-height:1.35}
+  .attpop .o .cb{flex:none;width:17px;height:17px;border:1.5px solid #cfcfcf;border-radius:3px;position:relative;background:#fff}
+  .attpop .o.on .cb{border-color:#ff9500;background:#ff9500}
+  .attpop .o.on .cb::after{content:"";position:absolute;left:5px;top:1px;width:4px;height:9px;
+        border:2px solid #fff;border-top:0;border-left:0;transform:rotate(42deg)}
+  .attpop .o .nm2{flex:1}
+  .attpop .o .add{color:#c0392b;font-size:12px;font-weight:700;white-space:nowrap}
+  .attpop .o .st{font-size:10px;color:#fff;background:#8a8a8a;border-radius:3px;padding:1px 5px;margin-left:4px;white-space:nowrap}
+  .attpop .o .tw{font-size:10px;color:#fff;background:#c0392b;border-radius:3px;padding:1px 5px;margin-left:4px;white-space:nowrap}
+  .attpop .o.dis{opacity:.42;cursor:not-allowed}
+  .attpop .note{font-size:10.5px;color:#9aa0a6;padding:4px 14px 18px;line-height:1.65}
+  .attpop .tb{flex:none;height:60px;background:#474747;display:flex;align-items:center;padding:0 12px;gap:8px}
+  .attpop .tb .amt{color:#fff;font-size:16px;font-weight:700}
+  .attpop .tb .hint{color:#ffc46b;font-size:11px}
+  .attpop .tb .go{margin-left:auto;background:#ff9500;color:#fff;border:0;border-radius:5px;height:44px;
+        padding:0 22px;font:inherit;font-size:14.5px;font-weight:700;cursor:pointer;white-space:nowrap}
+  .attpop .tb .go.dis{background:#8d8d8d;color:#e6e6e6}
+  .attsheet{position:absolute;inset:0;background:#f7f7f7;z-index:6;display:none;flex-direction:column}
+  .attsheet.on{display:flex;animation:up .2s ease}
+
+  /* ===== 右侧：现状 / 更新清单 ===== */
+  .panel{flex:1;min-width:330px;max-width:484px;background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+  .panel h2{margin:0 0 4px;font-size:15.5px}
+  .panel .ps{font-size:11.5px;color:#8a7e70;margin-bottom:14px}
+  .panel table{width:100%;border-collapse:collapse;font-size:12px}
+  .panel th,.panel td{border-bottom:1px solid #f0f0f0;padding:7px 6px;text-align:left;vertical-align:top}
+  .panel th{color:#8a7e70;font-weight:600;font-size:11px}
+  .panel td.u{width:26px;color:#c0392b;font-weight:700}
+  .panel tr.hl td{background:#fffaf4}
+  .panel .kpi{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .panel .kpi div{flex:1 1 0;min-width:52px;background:#f7f8fa;border-radius:9px;padding:9px 5px;text-align:center}
+  .panel .kpi b{display:block;font-size:17px;color:#c0392b;line-height:1.15}
+  .panel .kpi span{display:block;font-size:10px;color:#8a7e70;line-height:1.3;margin-top:2px}
+  .panel .upd{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid #f2f2f2}
+  .panel .upd:last-child{border-bottom:0}
+  .panel .upd .n{flex:none;width:20px;height:20px;border-radius:50%;background:#c0392b;color:#fff;
+        font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .panel .upd .b{min-width:0}
+  .panel .upd h4{margin:0 0 5px;font-size:12.5px}
+  .panel .upd p{margin:0 0 4px;font-size:11.5px;line-height:1.62;color:#555}
+  .panel .upd p.why{margin:0;color:#8a7e70;font-size:11px}
+  .panel .upd p b{color:#96291f;font-weight:700;margin-right:4px}
+  .panel .note{font-size:11px;color:#9aa0a6;line-height:1.7;margin-top:14px;border-top:1px dashed #eee;padding-top:12px}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="topbar">
+    <div>
+      <h1>大埔振興肉丸麵 · 掃碼點餐系統</h1>
+      <div class="sub">依實際系統（ag-pos）1:1 還原框架，切換檢視「我們建議更新的地方」</div>
+    </div>
+    <div class="seg">
+      <button id="mActual" class="on" onclick="setMode('actual')">實際系統（現狀）</button>
+      <button id="mIdeal" class="ideal" onclick="setMode('ideal')">理想版本（建議）</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="phone">
+      <div class="viewport">
+
+        <!-- 启动弹窗（真实系统 launch-popup） -->
+        <div class="launch" id="launch">
+          <div class="box">
+            <div class="art" id="launchArt">
+              <div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>
+            </div>
+            <a class="go" href="#" onclick="closeLaunch();return false;" id="launchGo">前往點餐(5s)</a>
+            <div class="adnote">原系統此連結點了沒有反應 · demo 已可點</div>
+          </div>
+        </div>
+
+        <!-- 顶部信息区 -->
+        <div class="hd">
+          <div class="r1">
+            <div class="ic">
+              <button class="ibtn" title="語言"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18"/></svg></button>
+              <button class="ibtn solid" title="字號"><svg viewBox="0 0 24 24" fill="currentColor"><text x="12" y="17" text-anchor="middle" font-size="14" font-weight="700" font-family="sans-serif">A</text></svg></button>
+            </div>
+            <div class="nm">大埔振興肉丸麵</div>
+            <div class="ic r">
+              <button class="ibtn" title="賬單記錄"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6"/></svg></button>
+              <button class="ibtn" title="搜尋" onclick="focusSearch()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg></button>
+            </div>
+          </div>
+          <div class="r2">
+            <div class="din">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3v8M4 3v5a2 2 0 0 0 4 0V3M6 11v10"/><path d="M16 3c2 2 2 5 0 7v11"/></svg>
+              <span>堂食</span>
+            </div>
+            <div class="meta">
+              <b>35枱</b>　<b>1人</b><br>
+              <span class="t">開台時間：12:21</span>
+            </div>
+            <button class="cancel">取消</button>
+          </div>
+        </div>
+
+        <div class="searchwrap">
+          <div class="sw">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
+            <input id="q" placeholder="請輸入菜品的名稱或編號" oninput="onSearch()">
+          </div>
+          <div class="hot hidden" id="hot">
+            <button onclick="quick('牛丸')">牛丸</button>
+            <button onclick="quick('沙嗲')">沙嗲</button>
+            <button onclick="quick('招牌')">招牌</button>
+            <button onclick="quick('飲品')">飲品</button>
+          </div>
+        </div>
+
+        <!-- 理想版：品牌背书条 -->
+        <div class="brand hidden" id="brandBar">
+          <div class="st"><b>振興</b><i>SUPPLY</i></div>
+          <div class="tx">本店丸類由 <b>大埔振興肉丸</b> 供應　·　1967 年創立　·　百分百牛肉</div>
+        </div>
+
+        <!-- 理想版：活动横幅 -->
+        <div class="act hidden" id="actBar">
+          <div class="k">TUESDAY ONLY · 逢二限定</div>
+          <h3>丸事星期二</h3>
+          <p>指定振興丸類菜式<b>加量 2 粒</b>，價格不變；滿額再送限量「丸侠」。</p>
+          <div class="m" id="actMascot"></div>
+        </div>
+
+        <!-- 理想版：赠品进度 -->
+        <div class="gifts hidden" id="giftBar">
+          <div class="gt">今日贈品進度</div>
+          <div class="gh" id="giftHint">仲差 $88 就解鎖「丸侠」限量公仔</div>
+          <div class="track"><div class="fill" id="fill"></div></div>
+          <div class="rows">
+            <div class="g" id="g58"><b>滿 $58</b><span>急凍小分量牛丸 100g 兌換券</span><em>未解鎖</em></div>
+            <div class="g" id="g88"><b>滿 $88</b><span>限量「丸侠」公仔 1 隻（每店每日 20 隻）</span><em>未解鎖</em></div>
+          </div>
+        </div>
+
+        <!-- 主体 -->
+        <div class="body">
+          <div class="cats" id="cats"></div>
+          <div class="items" id="items"></div>
+        </div>
+
+        <!-- 底部工具条 -->
+        <div class="toolbar">
+          <div class="cartbtn" onclick="openCart()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 4h2.2l2.2 11.2a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 2-1.6L21 7H6"/><circle cx="10" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/></svg>
+            <div class="badge hidden" id="cartBadge">0</div>
+            <div class="amt hidden" id="cartAmt">$0</div>
+          </div>
+          <div class="hint" id="toolHint"></div>
+          <div class="btns">
+            <a class="bill" onclick="openBill()">賬單記錄</a>
+            <a class="order" id="orderBtn">下單</a>
+          </div>
+        </div>
+
+        <!-- 规格弹窗（真实系统 attPopup，逐级为 麵底/自選湯底/配料/特別要求/配料加配） -->
+        <div class="attpop" id="attMask">
+          <div class="nav">
+            <button class="bk" onclick="closeAtt()">‹</button>
+            <div class="nm" id="attNavNm"></div>
+            <div class="pr" id="attNavPr"></div>
+          </div>
+          <div class="content" id="attContent"><div id="attBody"></div></div>
+          <div class="tb">
+            <span class="amt" id="attAmt">HK$0</span>
+            <span class="hint" id="attHint"></span>
+            <button class="go" id="attGo" onclick="attNext()">繼續選擇</button>
+          </div>
+          <!-- 套餐弹窗（真实系统 setMeal） -->
+          <div class="attsheet" id="attSheet">
+            <div class="nav">
+              <button class="bk" onclick="closeSet()">‹</button>
+              <div class="nm" id="setNavNm"></div>
+              <div class="pr" id="setNavPr"></div>
+            </div>
+            <div class="content" id="setContent"></div>
+            <div class="tb">
+              <span class="amt" id="setAmt">HK$0</span>
+              <button class="go" onclick="commitAtt()">加入訂購車</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 弹层：购物车 -->
+        <div class="mask" id="mask" onclick="if(event.target===this)closeSheet()">
+          <div class="sheet" id="sheet"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧说明 -->
+    <div class="panel">
+      <h2 id="pTitle">實測到的現狀</h2>
+      <div class="ps" id="pSub">資料來自 4 份實機頁面快照解析（2026-09-28 12:38–12:49）</div>
+      <div id="panelBody"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var MENU = [{"c":"精選午餐","n":"A.牛骨濃汁牛丸麵","p":"69","code":"1050","z":1,"so":0,"sn":0,"img":"092808e0d7.jpg"},{"c":"精選午餐","n":"B.秘製濃湯牛腩麵","p":"75","code":"1051","z":1,"so":0,"sn":0,"img":"1095638d43.jpg"},{"c":"精選午餐","n":"C.門鱔魚旦麵","p":"69","code":"1052","z":1,"so":0,"sn":0,"img":"523e11790f.jpg"},{"c":"精選午餐","n":"D.純鮮墨魚丸麵","p":"69","code":"1053","z":1,"so":0,"sn":0,"img":"62d23c412c.jpg"},{"c":"精選午餐","n":"E.豬骨濃汁貢丸麵","p":"59","code":"1054","z":1,"so":0,"sn":0,"img":"67f56366ee.jpg"},{"c":"精選午餐","n":"F.慢煮軟嫩豬軟骨麵","p":"79","code":"1055","z":1,"so":0,"sn":0,"img":"652edf0447.jpg"},{"c":"精選午餐","n":"G.沙嗲澳洲牛肉麵","p":"75","code":"1056","z":1,"so":0,"sn":0,"img":""},{"c":"精選午餐","n":"H.沙嗲牛腩麵","p":"80","code":"1057","z":1,"so":0,"sn":0,"img":""},{"c":"精選午餐","n":"I.麻辣沙嗲澳洲牛肉麵","p":"78","code":"1058","z":1,"so":0,"sn":0,"img":""},{"c":"精選午餐","n":"J.麻辣沙嗲牛腩麵","p":"83","code":"1059","z":1,"so":0,"sn":0,"img":""},{"c":"招牌麵","n":"牛骨濃汁牛丸麵","p":"59","code":"1003","z":1,"so":0,"sn":0,"img":"092808e0d7.jpg"},{"c":"招牌麵","n":"純墨魚丸麵","p":"62","code":"1009","z":1,"so":0,"sn":0,"img":"62d23c412c.jpg"},{"c":"招牌麵","n":"門鱔魚旦麵","p":"59","code":"1010","z":1,"so":0,"sn":0,"img":"523e11790f.jpg"},{"c":"節慶餐品","n":"麻辣火龍麵餐","p":"75","code":"1039","z":1,"so":0,"sn":0,"img":"eda32e23be.jpg"},{"c":"節慶餐品","n":"鮮茄澳洲牛肉麵餐","p":"85","code":"1040","z":1,"so":0,"sn":0,"img":"6416047989.jpg"},{"c":"節慶餐品","n":"麻辣火龍麵餐(單)","p":"65","code":"1041","z":1,"so":0,"sn":0,"img":"e435eb207c.jpg"},{"c":"節慶餐品","n":"鮮茄澳洲牛肉麵餐(單)","p":"75","code":"1042","z":1,"so":0,"sn":0,"img":"c21dcea3c2.jpg"},{"c":"雞類","n":"雞扒雙蛋麵","p":"65","code":"1036","z":1,"so":0,"sn":0,"img":""},{"c":"雞類","n":"沙嗲雞扒雙蛋麵","p":"70","code":"1037","z":1,"so":0,"sn":0,"img":""},{"c":"雞類","n":"麻辣沙嗲雞扒雙蛋麵","p":"73","code":"1038","z":1,"so":0,"sn":0,"img":""},{"c":"牛類","n":"彈牙牛筋丸麵","p":"53","code":"1002","z":1,"so":0,"sn":0,"img":"9a9fa8f7ed.jpg"},{"c":"牛類","n":"牛骨濃汁牛丸麵","p":"59","code":"1003","z":1,"so":0,"sn":0,"img":"092808e0d7.jpg"},{"c":"牛類","n":"牛骨清湯牛丸麵","p":"59","code":"1004","z":1,"so":0,"sn":0,"img":"83d7ab5cef.jpg"},{"c":"牛類","n":"正宗潮汕濃汁牛丸麵","p":"59","code":"1005","z":1,"so":0,"sn":0,"img":"428e0ef346.jpg"},{"c":"牛類","n":"澳洲和牛牛丸麵","p":"75","code":"1006","z":1,"so":0,"sn":0,"img":"20d6606155.jpg"},{"c":"牛類","n":"秘製濃湯牛腩麵","p":"65","code":"1011","z":1,"so":0,"sn":0,"img":"1095638d43.jpg"},{"c":"牛類","n":"純牛四寶麵","p":"99","code":"1015","z":1,"so":0,"sn":0,"img":""},{"c":"豬類","n":"豬骨濃汁貢丸麵","p":"49","code":"1007","z":1,"so":0,"sn":0,"img":"67f56366ee.jpg"},{"c":"豬類","n":"鮮嫰豬肉丸麵","p":"49","code":"1008","z":1,"so":0,"sn":0,"img":"5b6a8bcff5.jpg"},{"c":"豬類","n":"慢煮軟嫩豬軟骨麵","p":"69","code":"1012","z":1,"so":0,"sn":0,"img":"652edf0447.jpg"},{"c":"豬類","n":"魚豬如寶麵","p":"89","code":"1016","z":1,"so":0,"sn":0,"img":""},{"c":"海鮮類","n":"純墨魚丸麵","p":"62","code":"1009","z":1,"so":0,"sn":0,"img":"62d23c412c.jpg"},{"c":"海鮮類","n":"門鱔魚旦麵","p":"59","code":"1010","z":1,"so":0,"sn":0,"img":"523e11790f.jpg"},{"c":"餃類","n":"雲吞麵","p":"53","code":"1017","z":1,"so":0,"sn":0,"img":""},{"c":"餃類","n":"鳳城水餃麵","p":"53","code":"1018","z":1,"so":0,"sn":0,"img":""},{"c":"餃類","n":"白菜餃麵","p":"49","code":"1019","z":1,"so":0,"sn":0,"img":""},{"c":"餃類","n":"韮菜豬肉餃麵","p":"49","code":"1020","z":1,"so":0,"sn":0,"img":""},{"c":"沙爹類","n":"沙嗲澳洲牛肉麵","p":"65","code":"1030","z":1,"so":0,"sn":0,"img":""},{"c":"沙爹類","n":"沙嗲牛腩麵","p":"70","code":"1031","z":1,"so":0,"sn":0,"img":""},{"c":"沙爹類","n":"沙嗲澳洲牛肉手抓餅(單點)","p":"65","code":"2621","z":0,"so":0,"sn":1,"img":""},{"c":"沙爹類","n":"沙嗲牛腩手抓餅(單點)","p":"70","code":"2623","z":0,"so":0,"sn":1,"img":""},{"c":"沙爹類","n":"沙嗲澳洲牛肉手抓餅","p":"68","code":"2651","z":0,"so":0,"sn":1,"img":""},{"c":"沙爹類","n":"沙嗲牛腩手抓餅","p":"73","code":"2653","z":1,"so":0,"sn":0,"img":""},{"c":"麻辣沙嗲類","n":"麻辣沙嗲澳洲牛肉麵","p":"68","code":"1034","z":1,"so":0,"sn":0,"img":""},{"c":"麻辣沙嗲類","n":"麻辣沙嗲牛腩麵","p":"73","code":"1035","z":1,"so":0,"sn":0,"img":""},{"c":"麻辣沙嗲類","n":"麻辣沙嗲澳洲牛肉手抓餅(單點)","p":"68","code":"2625","z":0,"so":0,"sn":1,"img":""},{"c":"麻辣沙嗲類","n":"麻辣沙嗲牛腩手抓餅(單點)","p":"73","code":"2627","z":0,"so":0,"sn":1,"img":""},{"c":"麻辣沙嗲類","n":"麻辣沙嗲澳洲牛肉手抓餅","p":"71","code":"2655","z":0,"so":0,"sn":1,"img":""},{"c":"麻辣沙嗲類","n":"麻辣沙嗲牛腩手抓餅","p":"76","code":"2657","z":0,"so":0,"sn":1,"img":""},{"c":"飯類","n":"秘製濃湯牛腩飯","p":"65","code":"2610","z":1,"so":0,"sn":0,"img":"e4f9ff06d8.jpg"},{"c":"飯類","n":"慢煮豬軟骨飯","p":"65","code":"2611","z":1,"so":0,"sn":0,"img":"a6e952730e.jpg"},{"c":"飯類","n":"蔥油雞扒雙蛋飯","p":"65","code":"2612","z":1,"so":0,"sn":0,"img":"1e0005bf0a.jpg"},{"c":"飯類","n":"秘製濃湯牛腩飯(單點)","p":"62","code":"2613","z":1,"so":0,"sn":0,"img":"e4f9ff06d8.jpg"},{"c":"飯類","n":"慢煮豬軟骨飯(單點)","p":"62","code":"2614","z":1,"so":0,"sn":0,"img":"a6e952730e.jpg"},{"c":"飯類","n":"蔥油雞扒雙蛋飯(單點)","p":"62","code":"2615","z":1,"so":0,"sn":0,"img":"1e0005bf0a.jpg"},{"c":"飯類","n":"沙嗲澳洲牛肉飯(單點)","p":"65","code":"2620","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"沙嗲牛腩飯(單點)","p":"70","code":"2622","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"麻辣沙嗲澳洲牛肉飯(單點)","p":"68","code":"2624","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"麻辣沙嗲牛腩飯(單點)","p":"73","code":"2626","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"沙嗲雞扒雙蛋飯(單點)","p":"62","code":"2618","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"麻辣沙嗲雞扒雙蛋飯(單點)","p":"68","code":"2619","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"沙嗲澳洲牛肉飯","p":"68","code":"2650","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"沙嗲牛腩飯","p":"73","code":"2652","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"麻辣沙嗲澳洲牛肉飯","p":"71","code":"2654","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"麻辣沙嗲牛腩飯","p":"76","code":"2656","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"沙嗲雞扒雙蛋飯","p":"68","code":"2616","z":1,"so":0,"sn":0,"img":""},{"c":"飯類","n":"麻辣沙嗲雞扒雙蛋飯","p":"71","code":"2617","z":1,"so":0,"sn":0,"img":""},{"c":"淨食","n":"淨食","p":"0","code":"1013","z":1,"so":0,"sn":0,"img":""},{"c":"小食","n":"油菜(配蠔油)","p":"20","code":"2001","z":1,"so":0,"sn":0,"img":"f52a5404a7.jpg"},{"c":"小食","n":"燒賣(4粒)(學生）","p":"8","code":"2021","z":1,"so":0,"sn":0,"img":"c5332d2420.jpg"},{"c":"小食","n":"門鱔炸魚片","p":"69","code":"2002","z":1,"so":0,"sn":0,"img":"d15593c7eb.jpg"},{"c":"小食","n":"手工炸黃門鱔魚骨","p":"35","code":"2003","z":1,"so":0,"sn":0,"img":"3137bef194.jpg"},{"c":"小食","n":"潮汕海蝦棗(5件) (配潮汕甜醬)【特別優惠】","p":"49","code":"2004","z":1,"so":0,"sn":0,"img":"d1d91e5b5a.jpg"},{"c":"小食","n":"炸魚腐竹卷(3條) (配甜酸雞醬)","p":"30","code":"2005","z":1,"so":0,"sn":0,"img":"97ad7fbb70.jpg"},{"c":"小食","n":"炸純鮮墨魚丸(5粒)(潮汕甜醬)","p":"49","code":"2006","z":1,"so":0,"sn":0,"img":"044497c508.jpg"},{"c":"小食","n":"極鮮魚肉燒賣(6粒)(配香蔥豉油)","p":"15","code":"2007","z":1,"so":0,"sn":0,"img":"c5332d2420.jpg"},{"c":"小食","n":"炸雞塊(5件)","p":"30","code":"2008","z":1,"so":0,"sn":0,"img":"943da1beb7.jpg"},{"c":"小食","n":"墨魚餅(3塊) (配甜酸雞醬)","p":"35","code":"2009","z":1,"so":0,"sn":0,"img":"ee5648fd68.jpg"},{"c":"小食","n":"煎白菜豬肉餃 (4隻）","p":"35","code":"2075","z":1,"so":0,"sn":0,"img":""},{"c":"小食","n":"煎韮菜豬肉餃 (4隻)","p":"35","code":"2076","z":1,"so":0,"sn":0,"img":""},{"c":"小食","n":"煎澳洲和牛餃 (4隻)","p":"45","code":"2077","z":1,"so":0,"sn":0,"img":""},{"c":"小食","n":"響鈴卷 2條","p":"8","code":"2078","z":1,"so":0,"sn":0,"img":""},{"c":"小食","n":"香脆脆鈴卷(海苔) 2條","p":"8","code":"2079","z":1,"so":0,"sn":0,"img":""},{"c":"小食","n":"雞蛋","p":"5","code":"2099","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"熱奶茶","p":"18","code":"4001","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"凍奶茶","p":"20","code":"4002","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"熱檸茶","p":"18","code":"4003","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"凍檸茶","p":"20","code":"4004","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"熱咖啡","p":"20","code":"4005","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"凍咖啡","p":"24","code":"4006","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"熱齋啡","p":"20","code":"4007","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"凍齋啡","p":"24","code":"4008","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"熱檸水","p":"18","code":"4009","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"凍檸水","p":"20","code":"4010","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"可口可樂","p":"9","code":"051001","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"可口可樂(無糖)","p":"9","code":"051063","z":0,"so":1,"sn":0,"img":"321d331d1c.jpg"},{"c":"飲品","n":"生津解渴桔仔冰","p":"9","code":"051014","z":0,"so":1,"sn":0,"img":""},{"c":"飲品","n":"津路烏龍茶","p":"9","code":"051064","z":1,"so":0,"sn":0,"img":""},{"c":"飲品","n":"有得解仙草清涼爽","p":"9","code":"051071","z":1,"so":0,"sn":0,"img":"0d63b11165.jpg"}];
+var CATS = ["精選午餐","招牌麵","節慶餐品","雞類","牛類","豬類","海鮮類","餃類","沙爹類","麻辣沙嗲類","飯類","淨食","小食","飲品"];
+var NOTES = {"精選午餐":"09:00-14:30 供應","招牌麵":"09:00-23:00 供應","節慶餐品":"09:00-23:00 供應","雞類":"09:00-23:00 供應","牛類":"09:00-23:00 供應","豬類":"09:00-23:00 供應","海鮮類":"09:00-23:00 供應","餃類":"09:00-23:00 供應","沙爹類":"09:00-23:00 供應","麻辣沙嗲類":"09:00-23:00 供應","飯類":"09:00-23:00 供應","淨食":"09:00-23:00 供應","小食":"09:00-23:00 供應","飲品":"09:00-23:00 供應"};
+
+var ATT_GROUPS = [
+  {m:"單選",n:"麵底",must:1,max:1,o:[["竹昇麵(幼麵)","",0,0],["竹昇麵(粗麵)","",0,0],["米粉","",0,0],["河粉","",0,0],["米線","",0,0],["撈麵(幼麵)","12",0,0],["撈麵(粗麵)","12",0,0]]},
+  {m:"單選",n:"自選湯底",must:1,max:1,o:[["牛骨湯","",0,0],["龍躉魚骨湯","",0,0],["牛骨湯(多湯)","",0,0],["龍躉魚骨湯(多湯)","",0,0],["麻辣龍躉魚骨湯(小辣)","3",0,0],["麻辣龍躉魚骨湯(中辣)","3",0,0],["麻辣龍躉魚骨湯(大辣)","3",0,0],["特濃鮮茄湯","3",0,0]]},
+  {m:"單選",n:"配料",must:1,max:1,o:[["要(蔥、冬菜、炸蒜)","",0,0],["不要(蔥、冬菜、炸蒜)","",0,0]]},
+  {m:"如適用",n:"特別要求",must:0,max:1,o:[["扣底","",0,0],["加底","12",0,0]]},
+  {m:"如適用",n:"配料加配",must:0,max:4,o:[["岩漿海苔丸(2粒)（請小心爆汁及燙口）","",1,0],["魚豆腐(2粒)","10",0,0],["濃芝豆腐燒(2粒)","10",0,1],["醬爆咖喱炸旦 (2粒)（請小心爆汁及燙口）","10",0,1],["吸汁索魚腐 (2粒)","10",0,0],["魚皮餃(2粒)","10",0,0],["魷魚燒(2粒)","",0,1],["炙燒芝心丸(2粒)（請小心爆汁及燙口）","",1,0],["芝士包心丸(2粒)（請小心爆汁及燙口）","",1,0],["魚籽包心丸(2粒)（請小心爆汁及燙口）","",1,0],["芥末沙律球(2粒)（請小心爆汁及燙口）","",1,0],["福州魚丸(2粒)（請小心爆汁及燙口）","",1,0],["彈牙牛筋丸(2粒)","12",0,0],["豬骨濃汁貢丸(2粒)","12",0,0],["鮮嫰豬肉丸(2粒)","12",0,0],["門鱔白魚旦(2粒)","12",0,0],["門鱔炸魚角(2粒)","12",0,0],["金牌黑椒牛丸(2粒)","12",0,0],["金牌川辣牛丸(2粒)","12",0,0],["爆漿辛辣貢丸(2粒)（請小心爆汁及燙口）","",1,0],["QQ黑椒豬肉丸(4粒)","12",0,1],["松露香菇貢丸(2粒)","12",0,1],["胡椒豬肚貢丸(2粒)","12",0,0],["芋泥包心貢丸(2粒)（請小心爆汁及燙口）","12",0,0],["金牌牛肉丸(2粒)","",1,0],["豆卜魚腐(2粒)","",1,0],["廣東雲吞(2粒)","12",0,0],["鳳城水餃(2粒)","12",0,0],["白菜豬肉餃(2粒)","12",0,0],["韮菜豬肉餃(2粒)","12",0,0],["秘製濃湯牛腩(2件)","15",0,0],["慢煮豬軟骨(1件)","15",0,0],["牛骨濃汁牛丸(2粒)","18",0,0],["牛骨清湯牛丸(2粒)","18",0,0],["潮汕濃汁牛丸(2粒)","18",0,0],["純鮮墨魚丸(2粒)","18",0,0],["金牌蝦丸(2粒)","18",0,0],["港式沙爹包心牛丸(2粒)（請小心爆汁及燙口）","18",0,0],["辛辣牛丸(2粒)","",1,0],["爆漿麻辣芫茜皮蛋牛丸(2粒)（請小心爆汁及燙口）","",1,0],["爆漿咖喱牛丸(2粒)（請小心爆汁及燙口）","",1,0],["牛肉芝心丸(2粒)（請小心爆汁及燙口）","18",0,0],["醬爆瀨尿牛丸(2粒)（請小心爆汁及燙口）","",1,0],["羽衣甘藍貢丸(2粒)","",1,0],["三星蔥醬爆貢丸(2粒)（請小心爆汁及燙口）","",1,0],["薑汁皮旦貢丸(2粒)（請小心爆汁及燙口）","",1,0],["澳洲和牛牛丸(2粒)","24",0,0],["蟹粉包心墨魚丸(2粒)（請小心爆汁及燙口）","24",0,0],["十三香香辣牛丸2粒丸","18",0,0]]}
+];
+var SET_GROUPS = [
+  {m:"單選",n:"小食選1款",must:1,max:1,o:[["油菜(配蠔油)","免費",0,0],["香炸雞塊(4件)","免費",0,0],["極鮮魚肉燒賣(6粒)(配香蔥豉油)","免費",0,0]]},
+  {m:"單選",n:"飲品選1項",must:1,max:1,o:[["熱奶茶","免費",0,0],["熱檸茶","免費",0,0],["熱檸水","免費",0,0],["熱咖啡","免費",0,0],["熱齋啡","免費",0,0],["凍奶茶","8",0,0],["凍檸茶","8",0,0],["凍檸水","8",0,0],["凍咖啡","10",0,0],["凍齋啡","10",0,0],["可口可樂","免費",0,0],["可口可樂(無糖)","",1,0],["生津解渴桔仔冰","",1,0],["津路烏龍茶","免費",0,0],["有得解仙草清涼爽","免費",0,0]]}
+];
+
+var CART = {}, MODE = 'actual', CAT = CATS[0], Q = '';
+
+function el(id){ return document.getElementById(id); }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+function money(v){ return v.toFixed(0); }
+
+/* ---------- 丸侠 ---------- */
+function mascot(size){
+  return '<svg viewBox="0 0 90 90" width="'+size+'" height="'+size+'" xmlns="http://www.w3.org/2000/svg">'
+  + '<defs><radialGradient id="mb2" cx="36%" cy="28%" r="82%"><stop offset="0%" stop-color="#CFC6BF"/><stop offset="60%" stop-color="#A79C94"/><stop offset="100%" stop-color="#847A73"/></radialGradient>'
+  + '<linearGradient id="cp2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F6C63C"/><stop offset="100%" stop-color="#DFA018"/></linearGradient></defs>'
+  + '<path d="M23 42 C9 54 9 71 17 79 C23 71 25 61 27 55 Z" fill="url(#cp2)" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>'
+  + '<path d="M67 42 C81 54 81 71 73 79 C67 71 65 61 63 55 Z" fill="url(#cp2)" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>'
+  + '<circle cx="45" cy="45" r="27" fill="url(#mb2)" stroke="#111" stroke-width="2.8"/>'
+  + '<path d="M21 38 A 27 27 0 0 1 69 38" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>'
+  + '<path d="M23 37 C14 32 8 34 5 39 C11 40 17 42 21 45 Z" fill="#111"/>'
+  + '<circle cx="45" cy="27.5" r="9.4" fill="#F2C230" stroke="#111" stroke-width="2.6"/>'
+  + '<text x="45" y="33.2" text-anchor="middle" font-size="13" font-weight="700" fill="#C0392B" font-family="sans-serif">丸</text>'
+  + '<circle cx="35" cy="45" r="3.7" fill="#111"/><circle cx="55" cy="45" r="3.7" fill="#111"/>'
+  + '<ellipse cx="26" cy="54" rx="5" ry="3" fill="#E8917E" opacity=".6"/><ellipse cx="64" cy="54" rx="5" ry="3" fill="#E8917E" opacity=".6"/>'
+  + '<path d="M38 55 q7 7 14 0" stroke="#111" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>';
+}
+
+/* ---------- 加量规则（活动菜品） ---------- */
+var BALL = { '精選午餐':1, '招牌麵':1, '牛類':1, '豬類':1, '海鮮類':1 };
+function isBall(it){ return !!BALL[it.c]; }
+
+/* ---------- 渲染 ---------- */
+/* ---------- 渲染（真实结构：右栏一次渲染全部 14 组，左栏为滚动定位导航） ---------- */
+var SPY_LOCK = 0;
+function grpId(c){ return 'g' + CATS.indexOf(c); }
+
+function renderCats(){
+  var html = '';
+  CATS.forEach(function(c){
+    var on = (c === CAT) ? ' on' : '';
+    var tag = (MODE === 'ideal' && BALL[c]) ? '<i class="tag">丸</i>' : '';
+    var pin = (MODE === 'ideal' && c === '招牌麵') ? '<i class="pin">★</i>' : '';
+    html += '<div class="c' + on + '" data-cat="' + esc(c) + '" onclick="pickCat(\'' + c + '\')">' + pin + tag + esc(c) + '</div>';
+  });
+  el('cats').innerHTML = html;
+}
+
+function visibleItems(){
+  if (!Q) return MENU;
+  var k = Q.toLowerCase(), out = [];
+  MENU.forEach(function(it){
+    if (it.n.toLowerCase().indexOf(k) >= 0 || String(it.code).indexOf(k) >= 0) out.push(it);
+  });
+  return out;
+}
+
+function thumb(it){
+  return it.img
+    ? '<img src="dish/' + it.img + '" alt="" loading="lazy">'
+    : '<div class="noimg' + (MODE === 'ideal' ? ' brand' : '') + '">' + (MODE === 'ideal' ? '丸' : '?') + '</div>';
+}
+
+/* 理想版：售罄行给出同类替代（优先同名前缀，其次同分类最近的可点品项） */
+function altFor(it){
+  if (!it.so || MODE !== 'ideal') return '';
+  var best = null, bl = 0, i, x;
+  for (i = 0; i < MENU.length; i++){
+    x = MENU[i];
+    if (x.c !== it.c || x.n === it.n || !x.z || x.so || x.sn) continue;
+    var l = 0, m = Math.min(x.n.length, it.n.length);
+    while (l < m && x.n.charAt(l) === it.n.charAt(l)) l++;
+    if (l > bl){ bl = l; best = x; }
+  }
+  if (bl < 2) best = null;
+  if (!best){
+    var k = MENU.indexOf(it);
+    for (var d = 1; d < MENU.length; d++){
+      var a = MENU[k - d], b = MENU[k + d];
+      if (a && a.c === it.c && a.z && !a.so && !a.sn){ best = a; break; }
+      if (b && b.c === it.c && b.z && !b.so && !b.sn){ best = b; break; }
+    }
+  }
+  return best ? '<div class="alt">同類可選：' + esc(best.n) + '</div>' : '';
+}
+
+function renderItems(){
+  var box = el('items'), keep = box.scrollTop;
+  var list = visibleItems(), html = '', lastG = null;
+  if (!list.length){
+    box.innerHTML = '<div style="padding:40px 14px;text-align:center;color:#999;font-size:13px">找不到符合的菜品</div>';
+    return;
+  }
+  list.forEach(function(it){
+    if (it.c !== lastG){
+      html += '<div class="grp" id="' + grpId(it.c) + '" data-g="' + esc(it.c) + '">'
+            + '<span class="t">' + esc(it.c) + '</span><span class="s">' + esc(NOTES[it.c] || '') + '</span></div>';
+      lastG = it.c;
+    }
+    var q = CART[it.n] ? CART[it.n].q : 0;
+    var lbl = it.so ? '<span class="lbl">售罄</span>' : (it.sn ? '<span class="lbl soon">即將推出</span>' : '');
+    var ord = '';
+    if (it.z && !it.so && !it.sn){
+      ord = q
+        ? '<div class="ord"><button class="rb del" onclick="chg(\'' + esc(it.n) + '\',-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12h14"/></svg></button>'
+          + '<span class="cnt">' + q + '</span>'
+          + '<button class="rb" onclick="add(\'' + esc(it.n) + '\')">+</button></div>'
+        : '<div class="ord"><button class="rb" onclick="add(\'' + esc(it.n) + '\')">+</button></div>';
+    }
+    var addon = (MODE === 'ideal' && isBall(it) && !it.so && !it.sn)
+      ? '<div class="addon">逢星期二 · 加量 2 粒（價格不變）</div>' : '';
+    html += '<div class="it' + (it.so ? ' sold' : '') + '">'
+      + '<div class="nm" onclick="openAtt(\'' + esc(it.n) + '\')"><strong>' + esc(it.n) + lbl + '</strong>'
+      + (it.sn ? '<div class="sub">即將推出</div>' : '')
+      + (MODE === 'ideal' && isBall(it) ? '<div class="sub">振興丸類</div>' : '')
+      + '</div>'
+      + '<div class="ph" onclick="openAtt(\'' + esc(it.n) + '\')"><div class="fr">' + thumb(it) + '</div></div>'
+      + '<div class="prow"><div class="pr"><small>$</small>' + esc(it.p) + '</div>' + ord + '</div>'
+      + addon + altFor(it) + '</div>';
+  });
+  box.innerHTML = html;
+  box.scrollTop = keep;
+}
+
+function totals(){
+  var sum = 0, n = 0;
+  for (var k in CART) { sum += CART[k].p * CART[k].q; n += CART[k].q; }
+  return { sum: sum, n: n };
+}
+
+function renderBars(){
+  var t = totals();
+  if (MODE === 'ideal') {
+    var goal = t.sum >= 88 ? 1 : t.sum / 88;
+    el('fill').style.width = Math.min(100, goal * 100) + '%';
+    var o58 = t.sum >= 58, o88 = t.sum >= 88;
+    [['g58', o58], ['g88', o88]].forEach(function(p){
+      var e = el(p[0]);
+      e.className = 'g' + (p[1] ? ' ok' : '');
+      e.querySelector('em').textContent = p[1] ? '✓ 已解鎖' : '未解鎖';
+    });
+    var left = Math.max(0, 88 - t.sum);
+    el('giftHint').textContent = left > 0 ? ('仲差 $' + left + ' 就解鎖「丸侠」限量公仔') : '已解鎖全部贈品，多謝支持！';
+  } else {
+    el('fill').style.width = '0%';
+    var o58b = t.sum >= 58, o88b = t.sum >= 88;
+    [['g58', o58b], ['g88', o88b]].forEach(function(p){
+      var e = el(p[0]);
+      e.className = 'g' + (p[1] ? ' ok' : '');
+      e.querySelector('em').textContent = p[1] ? '✓ 已解鎖' : '未解鎖';
+    });
+    var leftb = Math.max(0, 88 - t.sum);
+    el('giftHint').textContent = leftb > 0 ? ('仲差 $' + leftb + ' 就解鎖「丸侠」限量公仔') : '已解鎖全部贈品，多謝支持！';
+  }
+  var b = el('cartBadge'), a = el('cartAmt');
+  if (MODE === 'ideal' && t.n > 0) {
+    b.classList.remove('hidden'); b.textContent = t.n;
+    a.classList.remove('hidden'); a.textContent = 'HK$' + money(t.sum);
+  } else { b.classList.add('hidden'); a.classList.add('hidden'); }
+  var ob = el('orderBtn');
+  if (t.n > 0) { ob.classList.add('act'); ob.textContent = '下單'; }
+  else { ob.classList.remove('act'); ob.textContent = '下單'; }
+}
+
+function render(){ renderCats(); renderItems(); renderBars(); }
+
+function pickCat(c){
+  CAT = c; Q = ''; el('q').value = '';
+  render();
+  scrollToGrp(c);
+}
+/* 分组标题是 position:sticky，offsetTop 会被吸附位置污染；
+   故取该分组下的第一行菜品（.it，非 sticky）作为定位锚点。 */
+function grpAnchor(c){
+  var t = document.getElementById(grpId(c));
+  if (!t) return null;
+  var n = t.nextElementSibling;
+  while (n && !(n.classList && n.classList.contains('it'))) n = n.nextElementSibling;
+  return n || t;
+}
+function scrollToGrp(c){
+  var box = el('items'), a = grpAnchor(c);
+  if (!a) return;
+  SPY_LOCK = Date.now() + 700;
+  var want = a.offsetTop - box.offsetTop, max = box.scrollHeight - box.clientHeight;
+  box.scrollTop = Math.max(0, Math.min(want, max));
+  if (want > max + 2){ CAT = c; renderCats(); }   /* 触底时直接锁定该分类 */
+}
+function spy(){
+  if (Date.now() < SPY_LOCK || Q) return;
+  var box = el('items'), y = box.scrollTop + 3, act = null;
+  CATS.forEach(function(c){
+    var g = document.getElementById(grpId(c)), a = grpAnchor(c);
+    if (!a) return;
+    /* 锚点是第一行菜品，再往上减掉分组标题自身高度，才是该分组的真实上边界 */
+    var top = (a.offsetTop - box.offsetTop) - (g ? g.offsetHeight : 0);
+    if (top <= y) act = c;
+  });
+  if (act && act !== CAT){ CAT = act; renderCats(); }
+}
+function chg(name, d){
+  if (!CART[name]) CART[name] = { p: +itemOf(name).p, q: 0 };
+  CART[name].q += d;
+  if (CART[name].q <= 0) delete CART[name];
+  render();
+}
+function itemOf(name){ for (var i=0;i<MENU.length;i++) if (MENU[i].n === name) return MENU[i]; return null; }
+function add(name){
+  var q = CART[name] ? CART[name].q : 0;
+  if (q === 0){ openAtt(name); return; }   /* 真实系统：首次加购须先选规格 */
+  chg(name, 1);
+}
+function onSearch(){ Q = el('q').value.trim(); render(); }
+function focusSearch(){ el('q').focus(); }
+function quick(k){ Q = k; el('q').value = k; render(); }
+
+/* ---------- 弹层 ---------- */
+function openCart(){
+  var t = totals(), html = '';
+  if (!t.n) html = '<div class="empty">未選擇餐點</div>';
+  else {
+    for (var k in CART) {
+      var it = itemOf(k);
+      html += '<div class="li"><div class="l">' + esc(k)
+        + (it && MODE === 'ideal' && isBall(it) ? '<em>逢星期二 · 丸類加量 2 粒</em>' : '')
+        + '</div><div class="r">$' + money(CART[k].p * CART[k].q)
+        + '<div class="q">' + CART[k].q + ' × $' + esc(CART[k].p) + '</div></div></div>';
+    }
+  }
+  html += '<div class="tot"><span>合計</span><span class="v">$' + money(t.sum) + '</span></div>'
+    + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '前往點餐並領取贈品' : '前往點餐') + '</button>'
+    + '<button class="ghost" onclick="closeSheet()">繼續點餐</button>'
+    + '<div class="legal">示範畫面，不對應真實交易。</div>';
+  el('sheet').innerHTML = html;
+  el('mask').classList.add('on');
+}
+function openBill(){
+  var items = [];
+  for (var k in CART) items.push({ n: k, q: CART[k].q, p: CART[k].p });
+  var t = totals();
+  var html = '<h3>賬單記錄</h3><div class="s">單號 23656　·　35 枱　·　' + (MODE === 'ideal' ? '大埔振興肉丸麵' : '大埔振興肉丸麵') + '</div>';
+  if (!items.length) html += '<div class="empty">尚未落單</div>';
+  else {
+    html += '<div class="s" style="margin:8px 0 2px">我的點菜記錄，共 ' + items.length + ' 條</div>';
+    items.forEach(function(i){
+      var tg = DETAIL[i.n] || [], chips = '';
+      if (tg.length){
+        chips = '<div class="tags">' + tg.map(function(t){
+          return '<i>' + esc(t.n) + (t.add && t.add !== '免費' ? ' <b>+' + t.add + '</b>' : '') + '</i>';
+        }).join('') + '</div>';
+      }
+      html += '<div class="li"><div class="l">' + i.q + ' × ' + esc(i.n) + chips
+        + '</div><div class="r">$' + money(i.p * i.q) + '</div></div>';
+    });
+    return void (el('sheet').innerHTML = html + '<div class="tot"><span>賬單合計</span><span class="v">$' + money(t.sum) + '</span></div>'
+      + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '加單並領取贈品' : '加單') + '</button>'
+      + '<button class="ghost" onclick="closeSheet()">返回</button>'
+      + '<div class="legal">示範畫面，不對應真實交易。</div>', el('mask').classList.add('on'));
+  }
+  el('sheet').innerHTML = html + '<button class="ghost" onclick="closeSheet()">返回</button>';
+  el('mask').classList.add('on');
+}
+function closeSheet(){ el('mask').classList.remove('on'); }
+
+function place(){
+  var t = totals();
+  var html = '<h3>落單成功</h3><div class="s">已送廚房　·　合計 $' + money(t.sum) + '</div>';
+  if (MODE === 'ideal' && t.sum >= 58) {
+    html += '<div class="li"><div class="l"><b>急凍小分量牛丸 100g 兌換券</b><em>憑券於大埔振興門市／官網／App 兌換，有效期 30 日</em></div></div>'
+      + '<div style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;background:#fffbea;border:1px dashed #d9b96a;border-radius:8px;padding:10px;text-align:center;color:#8a5e0b">TPCH-' + code() + '</div>';
+  }
+  if (MODE === 'ideal' && t.sum >= 88) {
+    html += '<div class="li" style="margin-top:8px"><div class="l"><b>限量「丸侠」公仔兌換券</b><em>憑券向店員領取，每店每日 20 隻</em></div></div>'
+      + '<div style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;background:#fffbea;border:1px dashed #d9b96a;border-radius:8px;padding:10px;text-align:center;color:#8a5e0b">MARBLE-' + code() + '</div>';
+  }
+  html += '<button class="big" style="margin-top:14px" onclick="CART={};closeSheet();render()">完成</button>'
+    + '<div class="legal">示範畫面，不對應真實交易。</div>';
+  el('sheet').innerHTML = html;
+}
+function code(){ var s='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',o=''; for(var i=0;i<6;i++) o+=s[Math.floor(Math.random()*s.length)]; return o; }
+
+/* ---------- 规格弹窗（真实 attPopup）与套餐弹窗（真实 setMeal） ---------- */
+var ATTOPEN = null, ATT_SEL = [], SET_SEL = [], SETON = false, DETAIL = {};
+
+function groupsFor(it){
+  if (it && /麵|米線|河粉|米粉/.test(it.n)) return ATT_GROUPS;
+  return [ATT_GROUPS[4]];   /* 非麵类：仅呈现已擷取到的「配料加配」分组 */
+}
+function curGroups(){ return groupsFor(ATTOPEN); }
+function isBallOpt(nm){ return /丸|球/.test(nm); }
+
+function openAtt(name){
+  var it = itemOf(name);
+  if (!it || !it.z) return;
+  ATTOPEN = it; SETON = false;
+  var gs = groupsFor(it);
+  ATT_SEL = gs.map(function(g){ return g.must ? [0] : []; });
+  SET_SEL = SET_GROUPS.map(function(g){ return g.must ? [0] : []; });
+  el('attNavNm').textContent = it.n;
+  el('attNavPr').textContent = '$' + it.p;
+  el('attBody').innerHTML = attBodyHTML();
+  el('attContent').scrollTop = 0;
+  renderAttFoot();
+  el('attMask').classList.add('on');
+}
+
+function twBanner(){
+  if (MODE !== 'ideal') return '';
+  return '<div class="twb">' + mascot(34)
+    + '<div><b>丸事星期二</b><br>「配料加配」中的丸類，逢二加量 2 → 4 粒，價格不變。</div></div>';
+}
+
+function attBodyHTML(){
+  var it = ATTOPEN, gs = curGroups(), h = '';
+  h += '<div class="hero' + (it.img ? '' : ' noimg') + '">'
+     + (it.img ? '<img src="dish/' + it.img + '" alt="">' : (MODE === 'ideal' ? '丸' : '?'))
+     + '</div>';
+  h += '<div class="card"><h3>' + esc(it.n) + '</h3>'
+     + '<div class="pi"><span class="k">' + esc(it.code) + '</span>　<b>$' + esc(it.p) + '</b></div></div>';
+  h += twBanner();
+  h += '<div class="glist">';
+  gs.forEach(function(g, gi){
+    h += '<div class="g"><div class="gt"><div class="m"><em>' + g.m + '</em>'
+       + '<span class="nm">' + esc(g.n) + '</span>'
+       + (g.max > 1 ? '<div class="mx">最多可選擇' + g.max + '項</div>' : '')
+       + '</div><span class="' + (g.must ? 'must">必選' : 'opt">可選擇') + '</span></div><div class="os">';
+    g.o.forEach(function(o, oi){
+      var nm = o[0], add = o[1], dis = o[2] || o[3], sel = ATT_SEL[gi].indexOf(oi) >= 0;
+      var tw = (MODE === 'ideal' && isBallOpt(nm) && !dis) ? '<span class="tw">逢二加量 2→4 粒</span>' : '';
+      var st = o[2] ? '<span class="st">售罄</span>' : (o[3] ? '<span class="st">即將推出</span>' : '');
+      h += '<div class="o' + (sel ? ' on' : '') + (dis ? ' dis' : '') + '" onclick="pickOpt(' + gi + ',' + oi + ')">'
+         + '<i class="cb"></i><span class="nm2">' + esc(nm) + tw + st + '</span>'
+         + (add ? '<span class="add">' + (add === '免費' ? '免費' : '+' + add) + '</span>' : '')
+         + '</div>';
+    });
+    h += '</div></div>';
+  });
+  h += '</div>';
+  h += '<div class="note">規格分組取自實機快照（1050 A.牛骨濃汁牛丸麵）。原系統之彈窗分組依品項而異，非麵類品項此處僅重建「配料加配」。</div>';
+  return h;
+}
+
+function pickOpt(gi, oi){
+  var g = curGroups()[gi], a = ATT_SEL[gi], at = a.indexOf(oi);
+  if (g.must && g.max <= 1){
+    ATT_SEL[gi] = (at >= 0) ? [] : [oi];
+  } else {
+    if (at >= 0) a.splice(at, 1);
+    else { if (g.max > 1 && a.length >= g.max) a.shift(); a.push(oi); }
+  }
+  var c = el('attContent'), keep = c.scrollTop;
+  el('attBody').innerHTML = attBodyHTML();
+  c.scrollTop = keep;
+  renderAttFoot();
+}
+
+function selTags(){
+  var gs = curGroups(), out = [];
+  gs.forEach(function(g, gi){
+    ATT_SEL[gi].forEach(function(oi){ out.push({ n: g.o[oi][0], add: g.o[oi][1] }); });
+  });
+  return out;
+}
+function selTags2(){
+  var out = [];
+  SET_GROUPS.forEach(function(g, gi){
+    SET_SEL[gi].forEach(function(oi){ out.push({ n: g.o[oi][0], add: g.o[oi][1] }); });
+  });
+  return out;
+}
+function attAmount(){
+  var p = +ATTOPEN.p;
+  selTags().concat(SETON ? selTags2() : []).forEach(function(t){
+    var m = /(\d+)/.exec(t.add || '');
+    if (m && t.add !== '免費') p += +m[1];
+  });
+  return p;
+}
+function missing(){
+  var out = [];
+  curGroups().forEach(function(g, gi){ if (g.must && !ATT_SEL[gi].length) out.push(g.n); });
+  return out;
+}
+function renderAttFoot(){
+  var amt = attAmount(), need = missing();
+  el('attAmt').textContent = 'HK$' + amt;
+  el('attHint').textContent = need.length ? ('請先選擇：' + need.join('、')) : '';
+  var go = el('attGo');
+  go.className = 'go' + (need.length ? ' dis' : '');
+}
+function attNext(){
+  if (missing().length) return;
+  if (SETON || /精選午餐/.test(ATTOPEN.c)){ openSet(); return; }
+  commitAtt();
+}
+
+/* 套餐弹窗（真实 setMeal：單選小食選1款 / 單選飲品選1項，必選·最多1項） */
+function openSet(){
+  SETON = true;
+  el('setNavNm').textContent = ATTOPEN.n;
+  el('setNavPr').textContent = '$' + ATTOPEN.p;
+  el('setContent').innerHTML = setBodyHTML();
+  el('setAmt').textContent = 'HK$' + attAmount();
+  el('attSheet').classList.add('on');
+}
+function setBodyHTML(){
+  var h = '';
+  SET_GROUPS.forEach(function(g, gi){
+    h += '<div class="glist"><div class="g"><div class="gt"><div class="m"><em>單選</em><span class="nm">' + esc(g.n) + '</span>'
+       + '<div class="mx">最多可選擇' + g.max + '項</div></div><span class="must">必選</span></div><div class="os">';
+    g.o.forEach(function(o, oi){
+      var sel = SET_SEL[gi].indexOf(oi) >= 0, dis = o[2] || o[3];
+      var st = o[2] ? '<span class="st">售罄</span>' : (o[3] ? '<span class="st">即將推出</span>' : '');
+      h += '<div class="o' + (sel ? ' on' : '') + (dis ? ' dis' : '') + '" onclick="pickOpt2(' + gi + ',' + oi + ')">'
+         + '<i class="cb"></i><span class="nm2">' + esc(o[0]) + st + '</span>'
+         + (o[1] ? '<span class="add">' + (o[1] === '免費' ? '免費' : '+' + o[1]) + '</span>' : '')
+         + '</div>';
+    });
+    h += '</div></div></div>';
+  });
+  h += '<div class="note">套餐分組取自實機快照（1050 A.牛骨濃汁牛丸麵 · 小食／飲品各選 1 款，免費）。</div>';
+  return h;
+}
+function pickOpt2(gi, oi){
+  var g = SET_GROUPS[gi], a = SET_SEL[gi], at = a.indexOf(oi);
+  SET_SEL[gi] = (at >= 0) ? [] : [oi];
+  var c = el('setContent'), keep = c.scrollTop;
+  el('setContent').innerHTML = setBodyHTML();
+  c.scrollTop = keep;
+  el('setAmt').textContent = 'HK$' + attAmount();
+}
+
+function commitAtt(){
+  if (!ATTOPEN) return;
+  var tags = selTags();
+  if (SETON) tags = tags.concat(selTags2());
+  if (MODE === 'ideal' && /精選午餐/.test(ATTOPEN.c) && isBall(ATTOPEN))
+    tags.push({ n: '丸類加量 2 粒', add: '逢二免費' });
+  var it = ATTOPEN, price = attAmount();
+  if (!CART[it.n]) CART[it.n] = { p: price, q: 0 };
+  CART[it.n].p = price;
+  CART[it.n].q += 1;
+  if (!DETAIL[it.n]) DETAIL[it.n] = tags;
+  closeSet(); closeAtt(); render();
+}
+function closeSet(){ el('attSheet').classList.remove('on'); SETON = false; }
+function closeAtt(){ el('attMask').classList.remove('on'); ATTOPEN = null; }
+
+/* ---------- 启动弹窗 ---------- */
+var launchTimer = null;
+function closeLaunch(){
+  el('launch').style.display = 'none';
+  if (launchTimer){ clearInterval(launchTimer); launchTimer = null; }
+  el('launchGo').textContent = '前往點餐(5s)';   /* 避免关闭后残留倒计时数字 */
+}
+function startLaunch(){
+  var n = 5;
+  el('launch').style.display = 'flex';
+  el('launchGo').textContent = '前往點餐(' + n + 's)';
+  launchTimer = setInterval(function(){
+    n--;
+    if (n <= 0) { closeLaunch(); return; }
+    el('launchGo').textContent = '前往點餐(' + n + 's)';
+  }, 1000);
+}
+
+/* ---------- 模式切换 ---------- */
+function setMode(m){
+  MODE = m;
+  closeSet(); closeAtt(); closeSheet();
+  el('mActual').className = (m === 'actual') ? 'on' : '';
+  el('mIdeal').className = 'ideal' + (m === 'ideal' ? ' on' : '');
+  ['brandBar','actBar','giftBar','hot'].forEach(function(id){ el(id).classList.toggle('hidden', m !== 'ideal'); });
+  el('launchArt').innerHTML = (m === 'ideal')
+    ? '<div style="width:100%;height:100%;background:linear-gradient(160deg,#c0392b,#7a1010);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center">'
+      + '<div style="font-size:11px;letter-spacing:3px;opacity:.85">TUESDAY ONLY</div>'
+      + '<div style="font-size:30px;font-weight:800;margin:6px 0 8px">丸事星期二</div>'
+      + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類加量 2 粒<br>滿 $88 送限量「丸侠」</div>'
+      + '<div style="margin-top:14px">' + mascot(96) + '</div></div>'
+    : '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
+  el('actMascot').innerHTML = mascot(74);
+  renderPanel();
+  render();
+}
+
+/* ---------- 右侧面板 ---------- */
+var ACTUAL_ROWS = [
+  ['', '菜單規模', '99 個品項，分 14 個分類'],
+  ['', '菜品圖片', '僅 42 項有真實照片，其餘 <b>57 項是空白佔位框</b>（58%）'],
+  ['', '品牌背書', '全頁只有店名「大埔振興肉丸麵」，沒有任何品牌來源／年份說明'],
+  ['', '活動層', '沒有任何促銷、加量、滿贈、會員機制的位置'],
+  ['', '購物車', '圓形純圖示按鈕，不顯示已點件數與金額'],
+  ['', '分類導航', '14 個分類平鋪，牛丸類淹沒在牛類／豬類／海鮮類之中'],
+  ['', '售罄處理', '「售罄／即將推出」只用灰色小字，且無替代推薦'],
+  ['', '搜尋', '搜尋框預設收起，要點右上角圖示才展開']
+];
+var IDEAL_ROWS = [
+  ['1', '品牌背書條', '門店名下方固定一條「本店丸類由大埔振興肉丸供應 · 1967 · 百分百牛肉」', '零成本、可通用於所有合作食肆；把「供應商」變成客人看得見的品質訊號'],
+  ['2', '活動層「丸事星期二」', '橫幅 + 指定丸類菜品標示「加量 2 粒（價格不變）」', '現有系統完全沒有活動位；加量而非降價，不動價格錨'],
+  ['3', '贈品進度條', '滿 $58 急凍牛丸兌換券／滿 $88 限量丸侠公仔，隨購物車金額即時聯動', '把「加量」升級成「加購動機」；兌換券零冷鏈、可核銷、可歸因'],
+  ['4', '無圖品項統一佔位', '57 個無照片品項改用品牌色「丸」字佔位卡', '現在 58% 品項在客人面前是空白框，直接壓低點擊；不必等補拍完照片'],
+  ['5', '購物車顯示件數與金額', '圓形購物車鈕加件數角標 + 金額', '減少「反覆點開確認」的摩擦'],
+  ['6', '分類導航加權重', '丸類相關分類加「丸」角標、招牌麵置頂標星', '14 個分類平鋪時，品牌核心資產（丸）無法在第一屏被看見'],
+  ['7', '售罄更明確', '名稱置灰 + 標籤，並在該行下方提示同類替代', '客人少找一次，就少一次放棄'],
+  ['8', '搜尋預設可見 + 熱詞', '搜尋框預設展開，附「牛丸／沙嗲／招牌／飲品」快捷詞', '實際系統已有搜尋能力，只是藏起來了，啟用成本幾乎為零'],
+  ['9', '規格彈窗：丸類加配「逢二加量」', '在真實的規格彈窗內，逢星期二把「配料加配」中的丸類選項標示為「2 粒 → 4 粒，價格不變」', '不必新增頁面。客人本來就在這個彈窗選加配，直接在原地加大份量，成本可控、價格錨不動']
+];
+
+function renderPanel(){
+  var ideal = (MODE === 'ideal');
+  el('pTitle').textContent = ideal ? '我們建議更新的地方' : '實測到的現狀';
+  el('pSub').textContent = ideal
+    ? '同一套框架，只加不減；每一項都可獨立取捨'
+    : '資料來自 4 份實機頁面快照解析（2026-09-28 12:38–12:49）';
+  var h = '';
+  h += '<div class="kpi">'
+    + '<div><b>99</b><span>菜品品項</span></div>'
+    + '<div><b>58%</b><span>無菜品圖</span></div>'
+    + '<div><b>14</b><span>分類</span></div>'
+    + '<div><b>9</b><span>售罄／待推</span></div>'
+    + '<div><b>15</b><span>加配丸類售罄</span></div>'
+    + '</div>';
+  if (ideal) {
+    h += '<div class="upds">';
+    IDEAL_ROWS.forEach(function(r){
+      h += '<div class="upd"><div class="n">' + r[0] + '</div><div class="b">'
+        + '<h4>' + r[1] + '</h4>'
+        + '<p><b>做法</b>' + r[2] + '</p>'
+        + '<p class="why"><b>為什麼</b>' + r[3] + '</p>'
+        + '</div></div>';
+    });
+    h += '</div>';
+  } else {
+    h += '<table><thead><tr><th class="u"></th><th>維度</th><th>現狀</th></tr></thead><tbody>';
+    ACTUAL_ROWS.forEach(function(r){
+      h += '<tr><td class="u"></td><td><b>' + r[1] + '</b></td><td>' + r[2] + '</td></tr>';
+    });
+    h += '</tbody></table>';
+  }
+  h += '<div class="note">'
+    + (ideal
+      ? '以上 9 項全部在「理想版本」分頁可見；切回「實際系統」即為現狀。'
+      : '此為 2026-09-28 於門店實機（35 枱 · 單號 23656）抓取的真實畫面，非估算。')
+    + '<br>彈窗分組取自實機快照：規格彈窗＝1050 A.牛骨濃汁牛丸麵（麵底 7 項／自選湯底 8 項／配料加配 49 項）；套餐彈窗＝小食 3 項＋飲品 15 項。'
+    + '<br>框架來源：ag-pos takeawaypayV2（Framework7 + Vue），demo 依原結構重建，樣式取原系統 CSS 變數。'
+    + '</div>';
+  el('panelBody').innerHTML = h;
+}
+
+/* ---------- 启动 ---------- */
+renderPanel();
+render();
+el('items').addEventListener('scroll', spy);
+startLaunch();
+el('launchArt').innerHTML = '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
+</script>
+</body>
+</html>
