@@ -8,7 +8,7 @@ Marketing Communications（MRTG2300）小組專案之課業示範。所有頁面
 | 路徑 | 說明 |
 | --- | --- |
 | `/` | 落地頁 |
-| `/tpch-pos-demo/` | 點餐系統對照：實際系統 vs 我們建議的版本（可切換），含 9 項更新建議 |
+| `/tpch-pos-demo/` | 點餐系統對照：實際系統 vs 我們建議的版本（可切換），純手機點餐介面 |
 | `/tpch-demo/` | 丸事星期二掃碼點餐示範頁（星期二 / 平日對照） |
 | `/tpch-demo/qr.html` | 二維碼圖頁 |
 
@@ -19,3 +19,8 @@ Marketing Communications（MRTG2300）小組專案之課業示範。所有頁面
 框架為 ag-pos takeawaypayV2（Framework7 + Vue），示範頁依原結構重建，樣式取原系統 CSS 變數。
 
 `/tpch-demo/` 為推廣活動機制的構想示範。
+
+## 相關文件
+
+現狀檢視與九項更新建議，見另附的 Word 報告《大埔振興點餐系統_現狀檢視與更新建議.docx》，
+不由本頁面承載。

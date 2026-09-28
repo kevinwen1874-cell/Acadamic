@@ -7,7 +7,7 @@
 <style>
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   body{margin:0;background:#dfe3e8;font-family:-apple-system,"PingFang HK","PingFang SC","Microsoft JhengHei",system-ui,sans-serif;color:#111}
-  .page{max-width:1180px;margin:0 auto;padding:18px 16px 60px}
+  .page{max-width:760px;margin:0 auto;padding:16px 16px 20px}
 
   /* ===== 顶部：模式切换 ===== */
   .topbar{background:#1f1f22;color:#fff;border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
@@ -232,29 +232,6 @@
   .attsheet{position:absolute;inset:0;background:#f7f7f7;z-index:6;display:none;flex-direction:column}
   .attsheet.on{display:flex;animation:up .2s ease}
 
-  /* ===== 右侧：现状 / 更新清单 ===== */
-  .panel{flex:1;min-width:330px;max-width:484px;background:#fff;border-radius:14px;padding:16px 18px;box-shadow:0 6px 20px rgba(0,0,0,.08)}
-  .panel h2{margin:0 0 4px;font-size:15.5px}
-  .panel .ps{font-size:11.5px;color:#8a7e70;margin-bottom:14px}
-  .panel table{width:100%;border-collapse:collapse;font-size:12px}
-  .panel th,.panel td{border-bottom:1px solid #f0f0f0;padding:7px 6px;text-align:left;vertical-align:top}
-  .panel th{color:#8a7e70;font-weight:600;font-size:11px}
-  .panel td.u{width:26px;color:#c0392b;font-weight:700}
-  .panel tr.hl td{background:#fffaf4}
-  .panel .kpi{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-  .panel .kpi div{flex:1 1 0;min-width:52px;background:#f7f8fa;border-radius:9px;padding:9px 5px;text-align:center}
-  .panel .kpi b{display:block;font-size:17px;color:#c0392b;line-height:1.15}
-  .panel .kpi span{display:block;font-size:10px;color:#8a7e70;line-height:1.3;margin-top:2px}
-  .panel .upd{display:flex;gap:10px;padding:11px 0;border-bottom:1px solid #f2f2f2}
-  .panel .upd:last-child{border-bottom:0}
-  .panel .upd .n{flex:none;width:20px;height:20px;border-radius:50%;background:#c0392b;color:#fff;
-        font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
-  .panel .upd .b{min-width:0}
-  .panel .upd h4{margin:0 0 5px;font-size:12.5px}
-  .panel .upd p{margin:0 0 4px;font-size:11.5px;line-height:1.62;color:#555}
-  .panel .upd p.why{margin:0;color:#8a7e70;font-size:11px}
-  .panel .upd p b{color:#96291f;font-weight:700;margin-right:4px}
-  .panel .note{font-size:11px;color:#9aa0a6;line-height:1.7;margin-top:14px;border-top:1px dashed #eee;padding-top:12px}
   .hidden{display:none!important}
 </style>
 </head>
@@ -264,7 +241,7 @@
   <div class="topbar">
     <div>
       <h1>大埔振興肉丸麵 · 掃碼點餐系統</h1>
-      <div class="sub">依實際系統（ag-pos）1:1 還原框架，切換檢視「我們建議更新的地方」</div>
+      <div class="sub">依實際系統（ag-pos）1:1 還原框架 · 可切換「實際系統」與「理想版本」</div>
     </div>
     <div class="seg">
       <button id="mActual" class="on" onclick="setMode('actual')">實際系統（現狀）</button>
@@ -406,12 +383,6 @@
       </div>
     </div>
 
-    <!-- 右侧说明 -->
-    <div class="panel">
-      <h2 id="pTitle">實測到的現狀</h2>
-      <div class="ps" id="pSub">資料來自 4 份實機頁面快照解析（2026-09-28 12:38–12:49）</div>
-      <div id="panelBody"></div>
-    </div>
   </div>
 </div>
 
@@ -908,76 +879,10 @@ function setMode(m){
       + '<div style="margin-top:14px">' + mascot(96) + '</div></div>'
     : '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
   el('actMascot').innerHTML = mascot(74);
-  renderPanel();
   render();
 }
 
-/* ---------- 右侧面板 ---------- */
-var ACTUAL_ROWS = [
-  ['', '菜單規模', '99 個品項，分 14 個分類'],
-  ['', '菜品圖片', '僅 42 項有真實照片，其餘 <b>57 項是空白佔位框</b>（58%）'],
-  ['', '品牌背書', '全頁只有店名「大埔振興肉丸麵」，沒有任何品牌來源／年份說明'],
-  ['', '活動層', '沒有任何促銷、加量、滿贈、會員機制的位置'],
-  ['', '購物車', '圓形純圖示按鈕，不顯示已點件數與金額'],
-  ['', '分類導航', '14 個分類平鋪，牛丸類淹沒在牛類／豬類／海鮮類之中'],
-  ['', '售罄處理', '「售罄／即將推出」只用灰色小字，且無替代推薦'],
-  ['', '搜尋', '搜尋框預設收起，要點右上角圖示才展開']
-];
-var IDEAL_ROWS = [
-  ['1', '品牌背書條', '門店名下方固定一條「本店丸類由大埔振興肉丸供應 · 1967 · 百分百牛肉」', '零成本、可通用於所有合作食肆；把「供應商」變成客人看得見的品質訊號'],
-  ['2', '活動層「丸事星期二」', '橫幅 + 指定丸類菜品標示「加量 2 粒（價格不變）」', '現有系統完全沒有活動位；加量而非降價，不動價格錨'],
-  ['3', '贈品進度條', '滿 $58 急凍牛丸兌換券／滿 $88 限量丸侠公仔，隨購物車金額即時聯動', '把「加量」升級成「加購動機」；兌換券零冷鏈、可核銷、可歸因'],
-  ['4', '無圖品項統一佔位', '57 個無照片品項改用品牌色「丸」字佔位卡', '現在 58% 品項在客人面前是空白框，直接壓低點擊；不必等補拍完照片'],
-  ['5', '購物車顯示件數與金額', '圓形購物車鈕加件數角標 + 金額', '減少「反覆點開確認」的摩擦'],
-  ['6', '分類導航加權重', '丸類相關分類加「丸」角標、招牌麵置頂標星', '14 個分類平鋪時，品牌核心資產（丸）無法在第一屏被看見'],
-  ['7', '售罄更明確', '名稱置灰 + 標籤，並在該行下方提示同類替代', '客人少找一次，就少一次放棄'],
-  ['8', '搜尋預設可見 + 熱詞', '搜尋框預設展開，附「牛丸／沙嗲／招牌／飲品」快捷詞', '實際系統已有搜尋能力，只是藏起來了，啟用成本幾乎為零'],
-  ['9', '規格彈窗：丸類加配「逢二加量」', '在真實的規格彈窗內，逢星期二把「配料加配」中的丸類選項標示為「2 粒 → 4 粒，價格不變」', '不必新增頁面。客人本來就在這個彈窗選加配，直接在原地加大份量，成本可控、價格錨不動']
-];
-
-function renderPanel(){
-  var ideal = (MODE === 'ideal');
-  el('pTitle').textContent = ideal ? '我們建議更新的地方' : '實測到的現狀';
-  el('pSub').textContent = ideal
-    ? '同一套框架，只加不減；每一項都可獨立取捨'
-    : '資料來自 4 份實機頁面快照解析（2026-09-28 12:38–12:49）';
-  var h = '';
-  h += '<div class="kpi">'
-    + '<div><b>99</b><span>菜品品項</span></div>'
-    + '<div><b>58%</b><span>無菜品圖</span></div>'
-    + '<div><b>14</b><span>分類</span></div>'
-    + '<div><b>9</b><span>售罄／待推</span></div>'
-    + '<div><b>15</b><span>加配丸類售罄</span></div>'
-    + '</div>';
-  if (ideal) {
-    h += '<div class="upds">';
-    IDEAL_ROWS.forEach(function(r){
-      h += '<div class="upd"><div class="n">' + r[0] + '</div><div class="b">'
-        + '<h4>' + r[1] + '</h4>'
-        + '<p><b>做法</b>' + r[2] + '</p>'
-        + '<p class="why"><b>為什麼</b>' + r[3] + '</p>'
-        + '</div></div>';
-    });
-    h += '</div>';
-  } else {
-    h += '<table><thead><tr><th class="u"></th><th>維度</th><th>現狀</th></tr></thead><tbody>';
-    ACTUAL_ROWS.forEach(function(r){
-      h += '<tr><td class="u"></td><td><b>' + r[1] + '</b></td><td>' + r[2] + '</td></tr>';
-    });
-    h += '</tbody></table>';
-  }
-  h += '<div class="note">'
-    + (ideal
-      ? '以上 9 項全部在「理想版本」分頁可見；切回「實際系統」即為現狀。'
-      : '此為 2026-09-28 於門店實機（35 枱 · 單號 23656）抓取的真實畫面，非估算。')
-    + '<br>彈窗分組取自實機快照：規格彈窗＝1050 A.牛骨濃汁牛丸麵（麵底 7 項／自選湯底 8 項／配料加配 49 項）；套餐彈窗＝小食 3 項＋飲品 15 項。'
-    + '<br>框架來源：ag-pos takeawaypayV2（Framework7 + Vue），demo 依原結構重建，樣式取原系統 CSS 變數。'
-    + '</div>';
-  el('panelBody').innerHTML = h;
-}
-
 /* ---------- 启动 ---------- */
-renderPanel();
 render();
 el('items').addEventListener('scroll', spy);
 startLaunch();
