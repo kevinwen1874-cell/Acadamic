@@ -208,7 +208,6 @@
   .attpop .o .nm2{flex:1}
   .attpop .o .add{color:#c0392b;font-size:12px;font-weight:700;white-space:nowrap}
   .attpop .o .st{font-size:10px;color:#fff;background:#8a8a8a;border-radius:3px;padding:1px 5px;margin-left:4px;white-space:nowrap}
-  .attpop .o .tw{font-size:10px;color:#fff;background:#c0392b;border-radius:3px;padding:1px 5px;margin-left:4px;white-space:nowrap}
   .attpop .o.dis{opacity:.42;cursor:not-allowed}
   .attpop .note{font-size:10.5px;color:#9aa0a6;padding:4px 14px 18px;line-height:1.65}
   .attpop .tb{flex:none;height:60px;background:#474747;display:flex;align-items:center;padding:0 12px;gap:8px}
@@ -598,7 +597,7 @@ function openCart(){
     for (var k in CART) {
       var it = itemOf(k);
       html += '<div class="li"><div class="l">' + esc(k)
-        + (it && MODE === 'ideal' && isBall(it) ? '<em>逢星期二 · 丸類加量 2 粒</em>' : '')
+        + (it && MODE === 'ideal' && isBall(it) ? '<em>逢星期二 · 丸類菜式加量 2 粒</em>' : '')
         + '</div><div class="r">$' + money(CART[k].p * CART[k].q)
         + '<div class="q">' + CART[k].q + ' × $' + esc(CART[k].p) + '</div></div></div>';
     }
@@ -663,7 +662,6 @@ function groupsFor(it){
   return [ATT_GROUPS[4]];   /* 非麵类：仅呈现已擷取到的「配料加配」分组 */
 }
 function curGroups(){ return groupsFor(ATTOPEN); }
-function isBallOpt(nm){ return /丸|球/.test(nm); }
 
 function openAtt(name){
   var it = itemOf(name);
@@ -683,7 +681,7 @@ function openAtt(name){
 function twBanner(){
   if (MODE !== 'ideal') return '';
   return '<div class="twb">' + mascot(34)
-    + '<div><b>丸事星期二</b><br>「配料加配」中的丸類，逢二加量 2 → 4 粒，價格不變。</div></div>';
+    + '<div><b>丸事星期二</b><br>指定振興丸類菜式，逢二加量 2 粒，價格不變（加配的配料不計）。</div></div>';
 }
 
 function attBodyHTML(){
@@ -702,10 +700,9 @@ function attBodyHTML(){
        + '</div><span class="' + (g.must ? 'must">必選' : 'opt">可選擇') + '</span></div><div class="os">';
     g.o.forEach(function(o, oi){
       var nm = o[0], add = o[1], dis = o[2] || o[3], sel = ATT_SEL[gi].indexOf(oi) >= 0;
-      var tw = (MODE === 'ideal' && isBallOpt(nm) && !dis) ? '<span class="tw">逢二加量 2→4 粒</span>' : '';
       var st = o[2] ? '<span class="st">售罄</span>' : (o[3] ? '<span class="st">即將推出</span>' : '');
       h += '<div class="o' + (sel ? ' on' : '') + (dis ? ' dis' : '') + '" onclick="pickOpt(' + gi + ',' + oi + ')">'
-         + '<i class="cb"></i><span class="nm2">' + esc(nm) + tw + st + '</span>'
+         + '<i class="cb"></i><span class="nm2">' + esc(nm) + st + '</span>'
          + (add ? '<span class="add">' + (add === '免費' ? '免費' : '+' + add) + '</span>' : '')
          + '</div>';
     });
@@ -851,7 +848,7 @@ function setMode(m){
     ? '<div style="width:100%;height:100%;background:linear-gradient(160deg,#c0392b,#7a1010);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center">'
       + '<div style="font-size:11px;letter-spacing:3px;opacity:.85">TUESDAY ONLY</div>'
       + '<div style="font-size:30px;font-weight:800;margin:6px 0 8px">丸事星期二</div>'
-      + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類加量 2 粒<br>滿 $88 送限量「丸侠」</div>'
+      + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類菜式加量 2 粒<br>滿 $88 送限量「丸侠」</div>'
       + '<div style="margin-top:14px">' + mascot(96) + '</div></div>'
     : '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
   el('actMascot').innerHTML = mascot(74);
