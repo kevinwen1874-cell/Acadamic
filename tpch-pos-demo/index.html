@@ -65,8 +65,8 @@
   #actBar{margin:8px 10px 0;border-radius:10px;background:linear-gradient(135deg,#c0392b,#96291f);color:#fff;padding:10px 12px;position:relative;overflow:hidden}
   #actBar .k{font-size:9.5px;letter-spacing:1.6px;opacity:.85}
   #actBar h3{margin:2px 0 3px;font-size:17px;font-weight:800}
-  #actBar p{margin:0;font-size:11.5px;opacity:.95;line-height:1.45;max-width:76%}
-  #actBar .m{position:absolute;right:4px;bottom:-8px;width:74px;height:74px;pointer-events:none}
+  #actBar p{margin:0;font-size:11.5px;opacity:.95;line-height:1.45;max-width:72%}
+  #actBar .m{position:absolute;right:2px;bottom:2px;width:96px;height:96px;pointer-events:none;display:flex;align-items:flex-end;justify-content:center}
 
   .gifts{margin:8px 10px 0;border:1px solid #eee;border-radius:10px;padding:9px 11px;background:#fff}
   .gifts .gt{font-size:12px;font-weight:700}
@@ -384,19 +384,10 @@ function money(v){ return v.toFixed(0); }
 
 /* ---------- 丸侠 ---------- */
 function mascot(size){
-  return '<svg viewBox="0 0 90 90" width="'+size+'" height="'+size+'" xmlns="http://www.w3.org/2000/svg">'
-  + '<defs><radialGradient id="mb2" cx="36%" cy="28%" r="82%"><stop offset="0%" stop-color="#CFC6BF"/><stop offset="60%" stop-color="#A79C94"/><stop offset="100%" stop-color="#847A73"/></radialGradient>'
-  + '<linearGradient id="cp2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#F6C63C"/><stop offset="100%" stop-color="#DFA018"/></linearGradient></defs>'
-  + '<path d="M23 42 C9 54 9 71 17 79 C23 71 25 61 27 55 Z" fill="url(#cp2)" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>'
-  + '<path d="M67 42 C81 54 81 71 73 79 C67 71 65 61 63 55 Z" fill="url(#cp2)" stroke="#111" stroke-width="2.6" stroke-linejoin="round"/>'
-  + '<circle cx="45" cy="45" r="27" fill="url(#mb2)" stroke="#111" stroke-width="2.8"/>'
-  + '<path d="M21 38 A 27 27 0 0 1 69 38" stroke="#111" stroke-width="7" fill="none" stroke-linecap="round"/>'
-  + '<path d="M23 37 C14 32 8 34 5 39 C11 40 17 42 21 45 Z" fill="#111"/>'
-  + '<circle cx="45" cy="27.5" r="9.4" fill="#F2C230" stroke="#111" stroke-width="2.6"/>'
-  + '<text x="45" y="33.2" text-anchor="middle" font-size="13" font-weight="700" fill="#C0392B" font-family="sans-serif">丸</text>'
-  + '<circle cx="35" cy="45" r="3.7" fill="#111"/><circle cx="55" cy="45" r="3.7" fill="#111"/>'
-  + '<ellipse cx="26" cy="54" rx="5" ry="3" fill="#E8917E" opacity=".6"/><ellipse cx="64" cy="54" rx="5" ry="3" fill="#E8917E" opacity=".6"/>'
-  + '<path d="M38 55 q7 7 14 0" stroke="#111" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>';
+  /* 丸侠官方形象（用戶提供素材，已摳透明底）——三處呼叫點共用 */
+  return '<img class="mascot" src="dish/mascot_beetball.png" alt="丸侠" '
+       + 'width="' + size + '" height="' + size + '" '
+       + 'style="width:' + size + 'px;height:' + size + 'px;object-fit:contain;display:block">';
 }
 
 /* ---------- 加量规则（活动菜品） ---------- */
@@ -848,7 +839,7 @@ function setMode(m){
       + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類菜式加量 2 粒<br>滿 $88 送限量「丸侠」</div>'
       + '<div style="margin-top:14px">' + mascot(96) + '</div></div>'
     : '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
-  el('actMascot').innerHTML = mascot(74);
+  el('actMascot').innerHTML = mascot(92);
   render();
 }
 
