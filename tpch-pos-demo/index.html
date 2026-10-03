@@ -483,7 +483,7 @@ function renderItems(){
         : '<div class="ord"><button class="rb" onclick="add(\'' + esc(it.n) + '\')">+</button></div>';
     }
     var addon = (MODE === 'ideal' && isBall(it) && !it.so && !it.sn)
-      ? '<div class="addon">逢星期二 · 加量 2 粒（價格不變）</div>' : '';
+      ? '<div class="addon">逢星期二 · 加量 2 粒！價格不變！</div>' : '';
     html += '<div class="it' + (it.so ? ' sold' : '') + '">'
       + '<div class="nm" onclick="openAtt(\'' + esc(it.n) + '\')"><strong>' + esc(it.n) + lbl + '</strong>'
       + (it.sn ? '<div class="sub">即將推出</div>' : '')
