@@ -26,7 +26,7 @@
   /* viewport 必须是纵向 flex，.body{flex:1} 才能拿到有界高度，右栏才可滚动 */
   .phone .viewport{flex:1;position:relative;overflow:hidden;background:#fff;
         display:flex;flex-direction:column}
-  .phone .viewport > .hd,.phone .viewport > .searchwrap,.phone .viewport > .brand,
+  .phone .viewport > .hd,.phone .viewport > .searchwrap,
   .phone .viewport > .act,.phone .viewport > .gifts{flex:none}
 
   /* ---- 启动弹窗（真实系统存在：launch-popup + 前往點餐(5s)） ---- */
@@ -56,24 +56,12 @@
   .hd .r2 .t{font-size:11px;color:#444}
   .hd .r2 .cancel{margin-left:auto;font-size:12.5px;color:#888;background:none;border:0;cursor:pointer;padding:6px 4px}
 
-  .searchwrap{padding:0 10px 8px;background:#fff}
+  .searchwrap{padding:0 10px 10px;background:#fff}
   .searchwrap input{width:100%;height:34px;border-radius:17px;border:1px solid #e2e2e2;background:#f5f5f5;
         padding:0 14px 0 32px;font:inherit;font-size:13px;outline:none}
   .searchwrap .sw{position:relative}
   .searchwrap .sw svg{position:absolute;left:11px;top:9px;width:16px;height:16px;color:#999}
-  .hot{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
-  .hot button{border:1px solid #f0d9a3;background:#fff8ea;color:#9a6b12;font:inherit;font-size:11.5px;
-        padding:3px 9px;border-radius:999px;cursor:pointer}
-
   /* ---- 理想版：品牌背书条 / 活动横幅 / 赠品进度 ---- */
-  .brand{display:flex;align-items:center;gap:8px;background:#fffdf8;border-top:1px solid #eee;border-bottom:1px solid #eee;
-        padding:7px 12px;font-size:11.5px;color:#6b5b47}
-  .brand .st{flex:none;width:28px;height:28px;border:1.4px solid #c0392b;border-radius:6px;color:#c0392b;
-        display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
-  .brand .st b{font-size:10px}
-  .brand .st i{font-size:6.5px;font-style:normal;letter-spacing:.4px;margin-top:1px}
-  .brand .tx b{color:#96291f}
-
   .act{margin:8px 10px 0;border-radius:10px;background:linear-gradient(135deg,#c0392b,#96291f);color:#fff;padding:10px 12px;position:relative;overflow:hidden}
   .act .k{font-size:9.5px;letter-spacing:1.6px;opacity:.85}
   .act h3{margin:2px 0 3px;font-size:17px;font-weight:800}
@@ -295,18 +283,6 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
             <input id="q" placeholder="請輸入菜品的名稱或編號" oninput="onSearch()">
           </div>
-          <div class="hot hidden" id="hot">
-            <button onclick="quick('牛丸')">牛丸</button>
-            <button onclick="quick('沙嗲')">沙嗲</button>
-            <button onclick="quick('招牌')">招牌</button>
-            <button onclick="quick('飲品')">飲品</button>
-          </div>
-        </div>
-
-        <!-- 理想版：品牌背书条 -->
-        <div class="brand hidden" id="brandBar">
-          <div class="st"><b>振興</b><i>SUPPLY</i></div>
-          <div class="tx">本店丸類由 <b>大埔振興肉丸</b> 供應　·　1967 年創立　·　百分百牛肉</div>
         </div>
 
         <!-- 理想版：活动横幅 -->
@@ -870,7 +846,7 @@ function setMode(m){
   closeSet(); closeAtt(); closeSheet();
   el('mActual').className = (m === 'actual') ? 'on' : '';
   el('mIdeal').className = 'ideal' + (m === 'ideal' ? ' on' : '');
-  ['brandBar','actBar','giftBar','hot'].forEach(function(id){ el(id).classList.toggle('hidden', m !== 'ideal'); });
+  ['actBar','giftBar'].forEach(function(id){ el(id).classList.toggle('hidden', m !== 'ideal'); });
   el('launchArt').innerHTML = (m === 'ideal')
     ? '<div style="width:100%;height:100%;background:linear-gradient(160deg,#c0392b,#7a1010);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center">'
       + '<div style="font-size:11px;letter-spacing:3px;opacity:.85">TUESDAY ONLY</div>'
