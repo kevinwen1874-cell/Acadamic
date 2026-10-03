@@ -600,7 +600,7 @@ function openCart(){
     }
   }
   html += '<div class="tot"><span>合計</span><span class="v">$' + money(t.sum) + '</span></div>'
-    + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '前往點餐並領取贈品' : '前往點餐') + '</button>'
+    + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '前往支付並領取贈品兌換碼' : '前往點餐') + '</button>'
     + '<button class="ghost" onclick="closeSheet()">繼續點餐</button>'
     + '<div class="legal">示範畫面，不對應真實交易。</div>';
   el('sheet').innerHTML = html;
@@ -625,7 +625,7 @@ function openBill(){
         + '</div><div class="r">$' + money(i.p * i.q) + '</div></div>';
     });
     return void (el('sheet').innerHTML = html + '<div class="tot"><span>賬單合計</span><span class="v">$' + money(t.sum) + '</span></div>'
-      + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '加單並領取贈品' : '加單') + '</button>'
+      + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '加單並領取贈品兌換碼' : '加單') + '</button>'
       + '<button class="ghost" onclick="closeSheet()">返回</button>'
       + '<div class="legal">示範畫面，不對應真實交易。</div>', el('mask').classList.add('on'));
   }
