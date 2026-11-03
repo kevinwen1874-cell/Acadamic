@@ -4,121 +4,209 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#7a1010">
-<title>丸事星期二 · 掃碼點餐｜實際 vs 理想</title>
+<title>掃碼點餐 · 二維碼｜實際版 / 理想版</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:"PingFang HK","PingFang SC","Microsoft JhengHei","Noto Sans HK",system-ui,sans-serif;
-       background:#faf6f2;color:#2b2118;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px 18px}
-  .card{background:#fff;border-radius:22px;box-shadow:0 14px 44px rgba(122,16,16,.13);max-width:440px;width:100%;
-        padding:30px 26px 34px;text-align:center;border-top:8px solid #d94a18}
-  .brand{font-size:12px;letter-spacing:.22em;color:#a08b7c;margin-bottom:12px}
-  h1{font-size:22px;color:#7a1010;margin-bottom:6px;letter-spacing:.02em}
-  .sub{font-size:13px;color:#8b7767;margin-bottom:20px;line-height:1.7}
-  .qrbox{width:min(300px,74vw);margin:0 auto 18px;background:#fff;border:1px solid #eee2d8;border-radius:14px;padding:12px}
+       background:#faf6f2;color:#2b2118;min-height:100vh;display:flex;align-items:center;justify-content:center;
+       padding:34px 18px 44px}
+  .wrap{max-width:940px;width:100%}
+  .kicker{font-size:11.5px;letter-spacing:.22em;color:#a08b7c;text-align:center;margin-bottom:12px}
+  h1{font-size:25px;color:#7a1010;text-align:center;margin-bottom:8px;letter-spacing:.02em}
+  .lead{font-size:13px;color:#8b7767;text-align:center;line-height:1.75;margin-bottom:26px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .card{background:#fff;border-radius:20px;box-shadow:0 12px 36px rgba(122,16,16,.10);
+        padding:24px 22px 26px;text-align:center;border-top:7px solid #8a8a8a;
+        display:flex;flex-direction:column;align-items:center}
+  .card.ideal{border-top-color:#d94a18}
+  .tab{display:inline-block;font-size:13.5px;font-weight:800;letter-spacing:.02em;
+       color:#4a4a4a;background:#f0ece7;border-radius:999px;padding:7px 16px;margin-bottom:12px}
+  .card.ideal .tab{color:#fff;background:#d94a18}
+  .desc{font-size:12.5px;color:#8b7767;line-height:1.7;margin-bottom:16px;min-height:62px}
+  .qrbox{width:min(258px,100%);background:#fff;border:1px solid #eee2d8;border-radius:12px;padding:10px;margin-bottom:14px}
   .qrbox svg{display:block;width:100%;height:auto}
-  .seal{display:inline-block;font-size:12.5px;font-weight:700;color:#7a1010;border:1.5px solid #d94a18;
-        border-radius:999px;padding:7px 15px;margin-bottom:18px;background:#fff6f0;line-height:1.5}
-  .url{font-size:11.5px;color:#9c8b7d;word-break:break-all;line-height:1.6;margin-bottom:20px}
-  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
-  button,a.btn{font-family:inherit;font-size:14px;font-weight:600;border:none;border-radius:11px;
-        padding:12px 20px;cursor:pointer;text-decoration:none;display:inline-block}
+  .url{font-size:10.5px;color:#a89a8c;word-break:break-all;line-height:1.6;margin-bottom:16px}
+  .row{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;margin-top:auto}
+  button,a.btn{font-family:inherit;font-size:13px;font-weight:600;border:none;border-radius:10px;
+       padding:11px 17px;cursor:pointer;text-decoration:none;display:inline-block}
   .primary{background:#d94a18;color:#fff}
+  .card.actual .primary{background:#6f6f6f}
   .ghost{background:#f3ece6;color:#7a1010}
-  .tip{font-size:11.5px;color:#a89a8c;margin-top:20px;line-height:1.7}
-  @media print{body{background:#fff;padding:0} .card{box-shadow:none;border-top-width:6px} .row,.tip{display:none}}
+  .foot{font-size:11.5px;color:#a89a8c;text-align:center;line-height:1.8;margin-top:24px}
+  @media (max-width:720px){ .grid{grid-template-columns:1fr} .lead br{display:none} }
+  @media print{
+    body{background:#fff;padding:0;display:block}
+    .wrap{max-width:none}
+    .card{box-shadow:none;border-radius:0;padding:14px}
+    .row,.lead{display:none}
+    .grid{gap:0}
+  }
 </style>
 </head>
 <body>
-  <div class="card">
-    <div class="brand">大埔振興肉丸 × 合作食肆</div>
-    <h1>丸事星期二</h1>
-    <p class="sub">用手機掃下方二維碼，即可看到<br>實際系統與我們的建議版本對照</p>
-    <div class="qrbox"><div id="qr"></div></div>
-    <div class="seal">大埔振興供應 · 1967 · 百分百牛肉</div>
-    <p class="url">https://kevinwen1874-cell.github.io/Acadamic/tpch-pos-demo/</p>
-    <div class="row">
-      <a class="btn primary" href="../tpch-pos-demo/">直接開啟點餐頁</a>
-      <button class="btn ghost" id="dl">下載 QR 圖（PNG）</button>
-      <button class="btn ghost" onclick="window.print()">列印</button>
+  <div class="wrap">
+    <div class="kicker">大埔振興肉丸 × 合作食肆</div>
+    <h1>掃碼點餐 · 二維碼</h1>
+    <p class="lead">兩個二維碼，各自直達一個版本。<br>
+    掃描後即進入點餐介面，頁面已鎖定該版本，沒有切換按鈕。</p>
+
+    <div class="grid">
+    <section class="card actual">
+      <div class="tab">① 實際系統（現狀）</div>
+      <p class="desc">門店現行 ag-pos 點餐介面：菜單、價格、售罄狀態與規格彈窗，均取自實機頁面快照。</p>
+      <div class="qrbox" data-key="actual">
+        <svg viewBox="0 0 45 45" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="① 實際系統（現狀） 二維碼">
+          <rect width="45" height="45" fill="#ffffff"/>
+          <path d="M4 4h7v1h-7zM12 4h1v1h-1zM17 4h1v1h-1zM19 4h1v1h-1zM21 4h3v1h-3zM25 4h3v1h-3zM30 4h2v1h-2zM34 4h7v1h-7zM4 5h1v1h-1zM10 5h1v1h-1zM13 5h2v1h-2zM16 5h5v1h-5zM22 5h1v1h-1zM24 5h1v1h-1zM26 5h1v1h-1zM32 5h1v1h-1zM34 5h1v1h-1zM40 5h1v1h-1zM4 6h1v1h-1zM6 6h3v1h-3zM10 6h1v1h-1zM14 6h1v1h-1zM20 6h7v1h-7zM34 6h1v1h-1zM36 6h3v1h-3zM40 6h1v1h-1zM4 7h1v1h-1zM6 7h3v1h-3zM10 7h1v1h-1zM12 7h1v1h-1zM14 7h2v1h-2zM18 7h1v1h-1zM20 7h1v1h-1zM22 7h2v1h-2zM26 7h2v1h-2zM29 7h1v1h-1zM32 7h1v1h-1zM34 7h1v1h-1zM36 7h3v1h-3zM40 7h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM10 8h1v1h-1zM12 8h3v1h-3zM19 8h1v1h-1zM22 8h1v1h-1zM27 8h1v1h-1zM31 8h2v1h-2zM34 8h1v1h-1zM36 8h3v1h-3zM40 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM15 9h2v1h-2zM18 9h2v1h-2zM22 9h3v1h-3zM26 9h1v1h-1zM28 9h1v1h-1zM32 9h1v1h-1zM34 9h1v1h-1zM40 9h1v1h-1zM4 10h7v1h-7zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM28 10h1v1h-1zM30 10h1v1h-1zM32 10h1v1h-1zM34 10h7v1h-7zM12 11h1v1h-1zM15 11h1v1h-1zM19 11h1v1h-1zM21 11h8v1h-8zM30 11h2v1h-2zM4 12h1v1h-1zM8 12h1v1h-1zM10 12h8v1h-8zM19 12h1v1h-1zM22 12h1v1h-1zM25 12h4v1h-4zM30 12h1v1h-1zM33 12h5v1h-5zM40 12h1v1h-1zM4 13h2v1h-2zM8 13h1v1h-1zM11 13h1v1h-1zM13 13h1v1h-1zM17 13h1v1h-1zM20 13h2v1h-2zM23 13h5v1h-5zM29 13h1v1h-1zM31 13h2v1h-2zM36 13h4v1h-4zM6 14h1v1h-1zM9 14h3v1h-3zM13 14h1v1h-1zM15 14h1v1h-1zM17 14h2v1h-2zM20 14h1v1h-1zM22 14h1v1h-1zM24 14h1v1h-1zM27 14h2v1h-2zM31 14h1v1h-1zM33 14h2v1h-2zM4 15h2v1h-2zM7 15h3v1h-3zM12 15h5v1h-5zM18 15h1v1h-1zM21 15h2v1h-2zM25 15h3v1h-3zM30 15h2v1h-2zM34 15h1v1h-1zM38 15h2v1h-2zM4 16h3v1h-3zM8 16h1v1h-1zM10 16h2v1h-2zM13 16h3v1h-3zM18 16h2v1h-2zM21 16h6v1h-6zM28 16h1v1h-1zM30 16h2v1h-2zM33 16h3v1h-3zM37 16h4v1h-4zM5 17h4v1h-4zM12 17h3v1h-3zM19 17h4v1h-4zM24 17h1v1h-1zM27 17h1v1h-1zM31 17h2v1h-2zM36 17h2v1h-2zM5 18h4v1h-4zM10 18h1v1h-1zM15 18h2v1h-2zM19 18h1v1h-1zM22 18h1v1h-1zM25 18h1v1h-1zM27 18h5v1h-5zM34 18h6v1h-6zM4 19h1v1h-1zM8 19h1v1h-1zM14 19h2v1h-2zM18 19h3v1h-3zM23 19h1v1h-1zM25 19h1v1h-1zM27 19h2v1h-2zM30 19h1v1h-1zM34 19h3v1h-3zM38 19h1v1h-1zM40 19h1v1h-1zM7 20h2v1h-2zM10 20h2v1h-2zM13 20h2v1h-2zM16 20h1v1h-1zM18 20h1v1h-1zM20 20h1v1h-1zM23 20h4v1h-4zM28 20h1v1h-1zM33 20h2v1h-2zM37 20h2v1h-2zM40 20h1v1h-1zM4 21h2v1h-2zM15 21h1v1h-1zM17 21h1v1h-1zM21 21h3v1h-3zM27 21h1v1h-1zM30 21h4v1h-4zM36 21h2v1h-2zM39 21h1v1h-1zM4 22h1v1h-1zM7 22h1v1h-1zM10 22h1v1h-1zM12 22h1v1h-1zM15 22h1v1h-1zM19 22h1v1h-1zM22 22h2v1h-2zM27 22h2v1h-2zM31 22h1v1h-1zM35 22h1v1h-1zM37 22h2v1h-2zM4 23h2v1h-2zM8 23h2v1h-2zM11 23h3v1h-3zM15 23h2v1h-2zM19 23h7v1h-7zM27 23h2v1h-2zM31 23h1v1h-1zM35 23h2v1h-2zM38 23h2v1h-2zM5 24h2v1h-2zM8 24h9v1h-9zM24 24h5v1h-5zM30 24h1v1h-1zM32 24h4v1h-4zM37 24h2v1h-2zM5 25h1v1h-1zM13 25h1v1h-1zM16 25h5v1h-5zM22 25h1v1h-1zM27 25h1v1h-1zM31 25h3v1h-3zM35 25h2v1h-2zM5 26h4v1h-4zM10 26h1v1h-1zM12 26h1v1h-1zM14 26h3v1h-3zM18 26h4v1h-4zM24 26h5v1h-5zM30 26h4v1h-4zM35 26h4v1h-4zM4 27h1v1h-1zM8 27h2v1h-2zM11 27h2v1h-2zM15 27h3v1h-3zM19 27h1v1h-1zM21 27h2v1h-2zM24 27h2v1h-2zM30 27h1v1h-1zM34 27h3v1h-3zM38 27h1v1h-1zM10 28h3v1h-3zM14 28h2v1h-2zM22 28h2v1h-2zM25 28h2v1h-2zM31 28h1v1h-1zM34 28h2v1h-2zM37 28h2v1h-2zM4 29h2v1h-2zM7 29h1v1h-1zM12 29h1v1h-1zM17 29h1v1h-1zM20 29h1v1h-1zM23 29h3v1h-3zM27 29h6v1h-6zM35 29h2v1h-2zM6 30h2v1h-2zM10 30h3v1h-3zM14 30h2v1h-2zM20 30h2v1h-2zM24 30h9v1h-9zM37 30h2v1h-2zM6 31h3v1h-3zM18 31h1v1h-1zM21 31h2v1h-2zM25 31h1v1h-1zM27 31h2v1h-2zM30 31h2v1h-2zM33 31h2v1h-2zM36 31h1v1h-1zM38 31h1v1h-1zM40 31h1v1h-1zM4 32h2v1h-2zM9 32h4v1h-4zM15 32h3v1h-3zM19 32h1v1h-1zM21 32h1v1h-1zM23 32h1v1h-1zM25 32h2v1h-2zM28 32h1v1h-1zM30 32h1v1h-1zM32 32h5v1h-5zM38 32h3v1h-3zM12 33h2v1h-2zM16 33h2v1h-2zM19 33h4v1h-4zM25 33h3v1h-3zM32 33h1v1h-1zM36 33h1v1h-1zM4 34h7v1h-7zM12 34h2v1h-2zM15 34h1v1h-1zM17 34h1v1h-1zM19 34h1v1h-1zM22 34h1v1h-1zM25 34h1v1h-1zM27 34h4v1h-4zM32 34h1v1h-1zM34 34h1v1h-1zM36 34h1v1h-1zM4 35h1v1h-1zM10 35h1v1h-1zM13 35h1v1h-1zM17 35h4v1h-4zM25 35h4v1h-4zM30 35h1v1h-1zM32 35h1v1h-1zM36 35h3v1h-3zM4 36h1v1h-1zM6 36h3v1h-3zM10 36h1v1h-1zM12 36h2v1h-2zM15 36h1v1h-1zM20 36h1v1h-1zM24 36h1v1h-1zM27 36h2v1h-2zM32 36h8v1h-8zM4 37h1v1h-1zM6 37h3v1h-3zM10 37h1v1h-1zM13 37h1v1h-1zM15 37h1v1h-1zM17 37h2v1h-2zM22 37h2v1h-2zM27 37h1v1h-1zM29 37h3v1h-3zM33 37h3v1h-3zM40 37h1v1h-1zM4 38h1v1h-1zM6 38h3v1h-3zM10 38h1v1h-1zM13 38h2v1h-2zM17 38h3v1h-3zM23 38h1v1h-1zM25 38h1v1h-1zM27 38h1v1h-1zM30 38h2v1h-2zM33 38h2v1h-2zM4 39h1v1h-1zM10 39h1v1h-1zM15 39h14v1h-14zM31 39h1v1h-1zM34 39h1v1h-1zM36 39h1v1h-1zM38 39h2v1h-2zM4 40h7v1h-7zM12 40h1v1h-1zM14 40h1v1h-1zM16 40h1v1h-1zM18 40h1v1h-1zM21 40h1v1h-1zM24 40h3v1h-3zM28 40h1v1h-1zM30 40h2v1h-2zM33 40h3v1h-3zM38 40h3v1h-3z" fill="#111111"/>
+        </svg>
+      </div>
+      <p class="url">https://kevinwen1874-cell.github.io/Acadamic/tpch-pos-demo/?mode=actual</p>
+      <div class="row">
+        <a class="btn primary" href="../tpch-pos-demo/?mode=actual" target="_blank" rel="noopener">直接開啟</a>
+        <button class="btn ghost" data-dl="actual" data-name="振興點餐_實際版_二維碼">下載 QR 圖（PNG）</button>
+      </div>
+    </section>
+    <section class="card ideal">
+      <div class="tab">② 理想版本（建議）</div>
+      <p class="desc">丸事星期二活動版：丸類菜式加量、贈品進度、逢二標籤，以及支付後領取贈品兌換碼。</p>
+      <div class="qrbox" data-key="ideal">
+        <svg viewBox="0 0 45 45" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="② 理想版本（建議） 二維碼">
+          <rect width="45" height="45" fill="#ffffff"/>
+          <path d="M4 4h7v1h-7zM12 4h5v1h-5zM19 4h1v1h-1zM21 4h1v1h-1zM23 4h3v1h-3zM27 4h1v1h-1zM30 4h2v1h-2zM34 4h7v1h-7zM4 5h1v1h-1zM10 5h1v1h-1zM13 5h1v1h-1zM18 5h2v1h-2zM22 5h2v1h-2zM26 5h1v1h-1zM28 5h1v1h-1zM32 5h1v1h-1zM34 5h1v1h-1zM40 5h1v1h-1zM4 6h1v1h-1zM6 6h3v1h-3zM10 6h1v1h-1zM20 6h3v1h-3zM25 6h4v1h-4zM34 6h1v1h-1zM36 6h3v1h-3zM40 6h1v1h-1zM4 7h1v1h-1zM6 7h3v1h-3zM10 7h1v1h-1zM12 7h4v1h-4zM17 7h2v1h-2zM20 7h1v1h-1zM22 7h1v1h-1zM26 7h2v1h-2zM29 7h1v1h-1zM32 7h1v1h-1zM34 7h1v1h-1zM36 7h3v1h-3zM40 7h1v1h-1zM4 8h1v1h-1zM6 8h3v1h-3zM10 8h1v1h-1zM12 8h3v1h-3zM18 8h5v1h-5zM27 8h1v1h-1zM31 8h2v1h-2zM34 8h1v1h-1zM36 8h3v1h-3zM40 8h1v1h-1zM4 9h1v1h-1zM10 9h1v1h-1zM12 9h1v1h-1zM14 9h2v1h-2zM18 9h4v1h-4zM23 9h2v1h-2zM26 9h1v1h-1zM28 9h1v1h-1zM32 9h1v1h-1zM34 9h1v1h-1zM40 9h1v1h-1zM4 10h7v1h-7zM12 10h1v1h-1zM14 10h1v1h-1zM16 10h1v1h-1zM18 10h1v1h-1zM20 10h1v1h-1zM22 10h1v1h-1zM24 10h1v1h-1zM26 10h1v1h-1zM28 10h1v1h-1zM30 10h1v1h-1zM32 10h1v1h-1zM34 10h7v1h-7zM12 11h1v1h-1zM14 11h2v1h-2zM17 11h1v1h-1zM23 11h3v1h-3zM27 11h2v1h-2zM30 11h2v1h-2zM4 12h1v1h-1zM8 12h1v1h-1zM10 12h3v1h-3zM15 12h1v1h-1zM18 12h1v1h-1zM20 12h1v1h-1zM24 12h5v1h-5zM30 12h1v1h-1zM33 12h5v1h-5zM40 12h1v1h-1zM4 13h1v1h-1zM6 13h3v1h-3zM11 13h2v1h-2zM18 13h1v1h-1zM21 13h3v1h-3zM25 13h1v1h-1zM27 13h1v1h-1zM29 13h1v1h-1zM31 13h2v1h-2zM36 13h4v1h-4zM5 14h1v1h-1zM9 14h2v1h-2zM12 14h1v1h-1zM14 14h1v1h-1zM16 14h4v1h-4zM22 14h2v1h-2zM27 14h2v1h-2zM31 14h1v1h-1zM33 14h2v1h-2zM4 15h4v1h-4zM9 15h1v1h-1zM11 15h3v1h-3zM15 15h1v1h-1zM19 15h9v1h-9zM30 15h2v1h-2zM34 15h1v1h-1zM38 15h2v1h-2zM5 16h1v1h-1zM9 16h4v1h-4zM16 16h1v1h-1zM21 16h2v1h-2zM24 16h5v1h-5zM30 16h2v1h-2zM33 16h3v1h-3zM37 16h4v1h-4zM4 17h2v1h-2zM8 17h1v1h-1zM11 17h1v1h-1zM14 17h1v1h-1zM17 17h4v1h-4zM22 17h1v1h-1zM24 17h1v1h-1zM27 17h1v1h-1zM31 17h2v1h-2zM36 17h2v1h-2zM8 18h6v1h-6zM15 18h2v1h-2zM19 18h1v1h-1zM21 18h1v1h-1zM25 18h7v1h-7zM34 18h6v1h-6zM4 19h1v1h-1zM7 19h1v1h-1zM9 19h1v1h-1zM14 19h1v1h-1zM17 19h1v1h-1zM19 19h5v1h-5zM25 19h1v1h-1zM27 19h2v1h-2zM30 19h1v1h-1zM34 19h3v1h-3zM38 19h1v1h-1zM40 19h1v1h-1zM4 20h5v1h-5zM10 20h4v1h-4zM15 20h2v1h-2zM22 20h2v1h-2zM25 20h2v1h-2zM28 20h1v1h-1zM33 20h2v1h-2zM37 20h2v1h-2zM40 20h1v1h-1zM4 21h2v1h-2zM8 21h2v1h-2zM11 21h1v1h-1zM13 21h1v1h-1zM16 21h1v1h-1zM18 21h1v1h-1zM20 21h2v1h-2zM23 21h2v1h-2zM27 21h1v1h-1zM30 21h4v1h-4zM36 21h2v1h-2zM39 21h1v1h-1zM6 22h2v1h-2zM9 22h3v1h-3zM15 22h1v1h-1zM17 22h1v1h-1zM20 22h1v1h-1zM22 22h1v1h-1zM24 22h1v1h-1zM27 22h2v1h-2zM31 22h1v1h-1zM35 22h1v1h-1zM37 22h2v1h-2zM7 23h3v1h-3zM13 23h2v1h-2zM16 23h1v1h-1zM18 23h1v1h-1zM21 23h2v1h-2zM25 23h1v1h-1zM27 23h2v1h-2zM31 23h1v1h-1zM35 23h2v1h-2zM38 23h2v1h-2zM5 24h1v1h-1zM10 24h2v1h-2zM17 24h3v1h-3zM23 24h6v1h-6zM30 24h1v1h-1zM32 24h4v1h-4zM37 24h2v1h-2zM4 25h1v1h-1zM6 25h4v1h-4zM13 25h3v1h-3zM19 25h4v1h-4zM25 25h1v1h-1zM27 25h1v1h-1zM31 25h3v1h-3zM35 25h2v1h-2zM4 26h1v1h-1zM6 26h2v1h-2zM9 26h2v1h-2zM12 26h1v1h-1zM14 26h2v1h-2zM17 26h4v1h-4zM22 26h1v1h-1zM24 26h2v1h-2zM27 26h2v1h-2zM30 26h4v1h-4zM35 26h4v1h-4zM5 27h1v1h-1zM7 27h1v1h-1zM9 27h1v1h-1zM14 27h2v1h-2zM17 27h1v1h-1zM19 27h1v1h-1zM24 27h3v1h-3zM30 27h1v1h-1zM34 27h3v1h-3zM38 27h1v1h-1zM4 28h2v1h-2zM7 28h7v1h-7zM17 28h1v1h-1zM20 28h1v1h-1zM23 28h2v1h-2zM31 28h1v1h-1zM34 28h2v1h-2zM37 28h2v1h-2zM4 29h2v1h-2zM7 29h1v1h-1zM9 29h1v1h-1zM13 29h2v1h-2zM17 29h1v1h-1zM22 29h2v1h-2zM25 29h1v1h-1zM27 29h6v1h-6zM35 29h2v1h-2zM7 30h1v1h-1zM10 30h4v1h-4zM15 30h1v1h-1zM18 30h2v1h-2zM21 30h1v1h-1zM23 30h1v1h-1zM25 30h8v1h-8zM37 30h2v1h-2zM6 31h4v1h-4zM12 31h1v1h-1zM14 31h1v1h-1zM16 31h1v1h-1zM18 31h8v1h-8zM27 31h2v1h-2zM30 31h2v1h-2zM33 31h2v1h-2zM36 31h1v1h-1zM38 31h3v1h-3zM4 32h2v1h-2zM7 32h2v1h-2zM10 32h2v1h-2zM13 32h4v1h-4zM18 32h1v1h-1zM21 32h1v1h-1zM25 32h2v1h-2zM28 32h1v1h-1zM30 32h1v1h-1zM32 32h5v1h-5zM38 32h3v1h-3zM12 33h1v1h-1zM15 33h6v1h-6zM22 33h1v1h-1zM25 33h3v1h-3zM32 33h1v1h-1zM36 33h1v1h-1zM4 34h7v1h-7zM12 34h3v1h-3zM19 34h1v1h-1zM21 34h1v1h-1zM27 34h4v1h-4zM32 34h1v1h-1zM34 34h1v1h-1zM36 34h1v1h-1zM4 35h1v1h-1zM10 35h1v1h-1zM13 35h3v1h-3zM19 35h4v1h-4zM26 35h3v1h-3zM30 35h1v1h-1zM32 35h1v1h-1zM36 35h3v1h-3zM4 36h1v1h-1zM6 36h3v1h-3zM10 36h1v1h-1zM12 36h3v1h-3zM17 36h2v1h-2zM22 36h1v1h-1zM26 36h3v1h-3zM32 36h8v1h-8zM4 37h1v1h-1zM6 37h3v1h-3zM10 37h1v1h-1zM14 37h1v1h-1zM17 37h2v1h-2zM20 37h1v1h-1zM23 37h2v1h-2zM27 37h1v1h-1zM29 37h3v1h-3zM33 37h3v1h-3zM40 37h1v1h-1zM4 38h1v1h-1zM6 38h3v1h-3zM10 38h1v1h-1zM14 38h1v1h-1zM17 38h2v1h-2zM20 38h1v1h-1zM24 38h2v1h-2zM27 38h1v1h-1zM30 38h2v1h-2zM33 38h2v1h-2zM4 39h1v1h-1zM10 39h1v1h-1zM14 39h2v1h-2zM21 39h2v1h-2zM25 39h4v1h-4zM31 39h1v1h-1zM34 39h1v1h-1zM36 39h1v1h-1zM38 39h2v1h-2zM4 40h7v1h-7zM12 40h3v1h-3zM17 40h3v1h-3zM21 40h1v1h-1zM23 40h4v1h-4zM28 40h1v1h-1zM30 40h2v1h-2zM33 40h3v1h-3zM38 40h3v1h-3z" fill="#111111"/>
+        </svg>
+      </div>
+      <p class="url">https://kevinwen1874-cell.github.io/Acadamic/tpch-pos-demo/?mode=ideal</p>
+      <div class="row">
+        <a class="btn primary" href="../tpch-pos-demo/?mode=ideal" target="_blank" rel="noopener">直接開啟</a>
+        <button class="btn ghost" data-dl="ideal" data-name="振興點餐_理想版_二維碼">下載 QR 圖（PNG）</button>
+      </div>
+    </section>
     </div>
-    <p class="tip">提示：點餐頁頂部可切換「實際系統 / 理想版本」<br>逐項對照現況與建議改動。</p>
+
+    <p class="foot">同一份菜單與價格，差別只在我們建議的改動。<br>
+    若需在兩版之間來回對照，請開啟 <strong>/tpch-pos-demo/</strong>（頁頂可切換）。<br>
+    本頁為課業示範，不對應任何真實交易。</p>
   </div>
 
 <script>
-/* 二維碼點陣：1 = 黑格，內容為本頁上方顯示的網址 */
-var M = [
-"111111100111011001100000001111111",
-"100000101101100001101110101000001",
-"101110101000001110001111001011101",
-"101110101111101011110101101011101",
-"101110100001111110111111101011101",
-"100000100111100101101110001000001",
-"111111101010101010101010101111111",
-"000000001101100110011011100000000",
-"100000101011011011010010111001110",
-"001111010000010101111011000011100",
-"001100100001111110000110000010110",
-"100010000100010000001000110111101",
-"110101111111010010011000101100000",
-"010010000100100000111011001100011",
-"011000110100111110000110011011110",
-"110001000011000100001000110011101",
-"111100111110100001001011110110001",
-"001110001111101110110001001001101",
-"111010100111010101010111101101111",
-"101010001100011110111001000011101",
-"000100111111011101001010110111000",
-"100000000100011111110111000111000",
-"100110111110010110001010001001010",
-"100111011000000110101000011000111",
-"111100100111001010000010111111010",
-"000000001100010110110011100010101",
-"111111100100110100000001101010110",
-"100000100100011100001001100011111",
-"101110100111100001010010111111010",
-"101110100111011111110001110111011",
-"101110100101011101011110110110011",
-"100000100100001010100010000111100",
-"111111101010110001111001110100110"
+var M_actual = [
+"1111111010000101011101110011001111111",
+"1000001001101111101010100000101000001",
+"1011101000100000111111100000001011101",
+"1011101010110010101100110100101011101",
+"1011101011100001001000010001101011101",
+"1000001010011011001110101000101000001",
+"1111111010101010101010101010101111111",
+"0000000010010001011111111011000000000",
+"1000101111111101001001111010011111001",
+"1100100101000100110111110101100011110",
+"0010011101010110101010011001011000000",
+"1101110011111010011001110011001000110",
+"1110101101110011011111101011011101111",
+"0111100011100001111010010001100011000",
+"0111101000011001001001011111001111110",
+"1000100000110011100101011010001110101",
+"0001101101101010100111101000011001101",
+"1100000000010100011100010011110011010",
+"1001001010010001001100011001000101100",
+"1100110111011001111111011001000110110",
+"0110111111111000000011111010111101100",
+"0100000001001111101000010001110110000",
+"0111101010111011110011111011110111100",
+"1000110110011101011011000010001110100",
+"0000001110110000001101100001001101100",
+"1101000010000100100111011111100110000",
+"0011001110110000110011111111100001100",
+"0011100000000010011001011011011010101",
+"1100011110011101010101101010111110111",
+"0000000011001101111001110000100010000",
+"1111111011010101001001011110101010000",
+"1000001001000111100001111010100011100",
+"1011101011010000100010011000111111110",
+"1011101001010110001100010111011100001",
+"1011101001100111000101010011011000000",
+"1000001000011111111111111001001010110",
+"1111111010101010010011101011011100111"
 ];
-var N = M.length, Q = 4, T = N + Q * 2;
+var M_ideal = [
+"1111111011111001010111010011001111111",
+"1000001001000011001100101000101000001",
+"1011101000000000111001111000001011101",
+"1011101011110110101000110100101011101",
+"1011101011100011111000010001101011101",
+"1000001010110011110110101000101000001",
+"1111111010101010101010101010101111111",
+"0000000010110100000111011011000000000",
+"1000101110010010100011111010011111001",
+"1011100110000010011101010101100011110",
+"0100011010101111001100011001011000000",
+"1111010111010001111111110011001000110",
+"0100011110001000011011111011011101111",
+"1100100100100111101010010001100011000",
+"0000111111011001010001111111001111110",
+"1001010000100101111101011010001110101",
+"1111101111011000001101101000011001101",
+"1100110101001010110110010011110011010",
+"0011011100010100101010011001000101100",
+"0001110001101010011001011001000110110",
+"0100001100000111000111111010111101100",
+"1011110001110001111001010001110110000",
+"1011011010110111101011011011110111100",
+"0101010000110101000011100010001110100",
+"1101111111000100100110000001001101100",
+"1101010001100100001101011111100110000",
+"0001001111010011010101111111100001100",
+"0011110010101011111111011011011010111",
+"1101101101111010010001101010111110111",
+"0000000010011111101001110000100010000",
+"1111111011100001010000011110101010000",
+"1000001001110001111000111010100011100",
+"1011101011100110001000111000111111110",
+"1011101000100110100110010111011100001",
+"1011101000100110100011010011011000000",
+"1000001000110000011001111001001010110",
+"1111111011100111010111101011011100111"
+];
 
-(function draw(){
-  var d = '';
-  for (var y = 0; y < N; y++) {
+var Q = 4;
+function draw(key, host){
+  var M = (key === 'actual') ? M_actual : M_ideal;
+  var N = M.length, T = N + Q*2, d = '';
+  for (var y = 0; y < N; y++){
     var r = M[y], x = 0;
-    while (x < N) {
-      if (r.charAt(x) === '1') {
+    while (x < N){
+      if (r.charAt(x) === '1'){
         var x0 = x;
         while (x < N && r.charAt(x) === '1') x++;
         var w = x - x0;
-        d += 'M' + (x0 + Q) + ' ' + (y + Q) + 'h' + w + 'v1h' + (-w) + 'z';
+        d += 'M' + (x0+Q) + ' ' + (y+Q) + 'h' + w + 'v1h' + (-w) + 'z';
       } else { x++; }
     }
   }
-  document.getElementById('qr').innerHTML =
-    '<svg viewBox="0 0 ' + T + ' ' + T + '" shape-rendering="crispEdges" xmlns="http://www.w3.org/2000/svg"'
-    + ' role="img" aria-label="丸事星期二點餐對照頁二維碼">'
-    + '<rect width="' + T + '" height="' + T + '" fill="#ffffff"/>'
-    + '<path d="' + d + '" fill="#111111"/></svg>';
-})();
+  var svg = host.querySelector('svg');
+  svg.setAttribute('viewBox', '0 0 ' + T + ' ' + T);
+  svg.querySelector('path').setAttribute('d', d);
+}
+document.querySelectorAll('.qrbox').forEach(function(b){ draw(b.dataset.key, b); });
 
-document.getElementById('dl').onclick = function () {
-  var S = 16, c = document.createElement('canvas');
-  c.width = c.height = T * S;
-  var g = c.getContext('2d');
-  g.fillStyle = '#ffffff'; g.fillRect(0, 0, c.width, c.height);
-  g.fillStyle = '#000000';
-  for (var y = 0; y < N; y++) {
-    for (var x = 0; x < N; x++) {
-      if (M[y].charAt(x) === '1') g.fillRect((x + Q) * S, (y + Q) * S, S, S);
-    }
-  }
-  var a = document.createElement('a');
-  a.download = '丸事星期二_點餐對照頁二維碼.png';
-  a.href = c.toDataURL('image/png');
-  a.click();
-};
+document.querySelectorAll('button[data-dl]').forEach(function(btn){
+  btn.onclick = function(){
+    var key = btn.dataset.dl, M = (key === 'actual') ? M_actual : M_ideal;
+    var N = M.length, T = N + Q*2, S = 16;
+    var c = document.createElement('canvas');
+    c.width = c.height = T*S;
+    var g = c.getContext('2d');
+    g.fillStyle = '#ffffff'; g.fillRect(0,0,c.width,c.height);
+    g.fillStyle = '#000000';
+    for (var y = 0; y < N; y++)
+      for (var x = 0; x < N; x++)
+        if (M[y].charAt(x) === '1') g.fillRect((x+Q)*S, (y+Q)*S, S, S);
+    var a = document.createElement('a');
+    a.download = btn.dataset.name + '.png';
+    a.href = c.toDataURL('image/png');
+    a.click();
+  };
+});
 </script>
 </body>
 </html>

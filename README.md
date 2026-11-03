@@ -10,7 +10,7 @@ Marketing Communications（MRTG2300）小組專案之課業示範。所有頁面
 | `/` | 落地頁 |
 | `/tpch-pos-demo/` | 點餐系統對照：實際系統 vs 我們建議的版本（可切換），純手機點餐介面 |
 | `/tpch-demo/` | 丸事星期二掃碼點餐示範頁（星期二 / 平日對照） |
-| `/tpch-demo/qr.html` | 二維碼圖頁 |
+| `/tpch-demo/qr.html` | 二維碼圖頁：實際版、理想版各一，掃碼直達對應介面 |
 
 ## 資料來源
 
