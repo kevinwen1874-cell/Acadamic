@@ -33,7 +33,11 @@
   .phone .viewport{flex:1;position:relative;overflow:hidden;background:#fff;
         display:flex;flex-direction:column}
   .phone .viewport > .hd,.phone .viewport > .searchwrap,
-  .phone .viewport > .act,.phone .viewport > .gifts{flex:none}
+  .phone .viewport > .promo{flex:none}
+  /* ---- 活動區（橫幅＋贈品進度）：不鎖死，可上劃收起，把版面還給菜單 ---- */
+  .promo{overflow:hidden;background:#fff;transition:height .26s cubic-bezier(.4,0,.2,1)}
+  .promo > .promoIn{display:flow-root;transition:transform .26s cubic-bezier(.4,0,.2,1);will-change:transform}
+  .promo.min > .promoIn{transform:translateY(-100%)}
 
   /* ---- 启动弹窗（真实系统存在：launch-popup + 前往點餐(5s)） ---- */
   .launch{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:60;display:flex;align-items:center;justify-content:center;padding:26px}
@@ -289,6 +293,8 @@
           </div>
         </div>
 
+        <!-- 理想版：活動區（橫幅＋贈品進度）—— 不鎖死，上劃可收起 -->
+        <div class="promo" id="promoWrap"><div class="promoIn" id="promoIn">
         <!-- 理想版：活动横幅 -->
         <div class="act hidden" id="actBar">
           <div class="k">TUESDAY ONLY · 逢二限定</div>
@@ -307,6 +313,7 @@
             <div class="g" id="g88"><b>滿 $88</b><span>限量「丸侠」公仔 1 隻（每店每日 20 隻）</span><em>未解鎖</em></div>
           </div>
         </div>
+        </div></div>
 
         <!-- 主体 -->
         <div class="body">
@@ -531,7 +538,25 @@ function renderBars(){
   else { ob.classList.remove('act'); ob.textContent = '下單'; }
 }
 
-function render(){ renderCats(); renderItems(); renderBars(); }
+/* ---------- 活動區：不鎖死，上劃收起（把半屏版面還給菜單） ---------- */
+var PROMO_MIN = false;
+function promoHidden(){
+  return el('actBar').classList.contains('hidden') && el('giftBar').classList.contains('hidden');
+}
+function promoNatH(){ return promoHidden() ? 0 : el('promoIn').offsetHeight; }
+function setPromo(min){
+  if (min === PROMO_MIN) return;
+  PROMO_MIN = min;
+  var w = el('promoWrap');
+  w.style.height = (min ? 0 : promoNatH()) + 'px';
+  w.classList.toggle('min', min);
+}
+function fitPromo(){
+  var w = el('promoWrap');
+  w.style.height = (PROMO_MIN ? 0 : promoNatH()) + 'px';
+}
+
+function render(){ renderCats(); renderItems(); renderBars(); fitPromo(); }
 
 function pickCat(c){
   CAT = c; Q = ''; el('q').value = '';
@@ -834,6 +859,7 @@ function startLaunch(){
 /* ---------- 模式切换 ---------- */
 function setMode(m){
   MODE = m;
+  PROMO_MIN = false;
   closeSet(); closeAtt(); closeSheet();
   el('mActual').className = (m === 'actual') ? 'on' : '';
   el('mIdeal').className = 'ideal' + (m === 'ideal' ? ' on' : '');
@@ -864,7 +890,29 @@ if (PMODE) {
   startLaunch();
   el('launchArt').innerHTML = '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
 }
-el('items').addEventListener('scroll', spy);
+el('items').addEventListener('scroll', function(){
+  spy();
+  /* 菜單往上滑就收起活動區；回到頂部再展開（帶滯回，避免邊界抖動） */
+  var y = el('items').scrollTop;
+  if (!PROMO_MIN && y > 48) setPromo(true);
+  else if (PROMO_MIN && y <= 2) setPromo(false);
+});
+
+/* 直接按住活動區上劃也能收起（下劃可展開），不必先滾菜單 */
+(function(){
+  var p = el('promoWrap'), y0 = 0, on = false;
+  p.addEventListener('touchstart', function(e){ y0 = e.touches[0].clientY; on = true; }, {passive:true});
+  p.addEventListener('touchmove', function(e){
+    if (!on) return;
+    var dy = e.touches[0].clientY - y0;
+    if (dy < -20){ on = false; setPromo(true); }
+    else if (dy > 20){ on = false; setPromo(false); }
+  }, {passive:true});
+  p.addEventListener('touchend', function(){ on = false; }, {passive:true});
+})();
+
+window.addEventListener('resize', fitPromo);
+window.addEventListener('load', fitPromo);
 </script>
 </body>
 </html>
