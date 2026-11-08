@@ -341,7 +341,7 @@
           <div class="mrow">
             <span class="mk" id="mk58">滿 $58</span>
             <span class="mk" id="mk88">滿 $88</span>
-            <em id="miniTip">仲差 $88 解鎖「丸侠」</em>
+            <em id="miniTip">仲差 $58 換牛丸兌換券！</em>
           </div>
           <div class="mbar"><div class="mfill" id="miniFill"></div>
             <i class="tk" style="left:58%"></i><i class="tk end" style="left:88%"></i>
@@ -595,8 +595,8 @@ function updMini(){
   k58.textContent = (o58 ? '✓ ' : '') + '滿 $58';
   k88.textContent = (o88 ? '✓ ' : '') + '滿 $88';
   el('miniTip').textContent = o88 ? '已解鎖全部贈品'
-    : (o58 ? '仲差 $' + (88 - s) + ' 再送「丸侠」公仔'
-           : '仲差 $' + (58 - s) + ' 換牛丸兌換券');
+    : (o58 ? '仲差 $' + (88 - s) + ' 再送「丸侠」公仔！！'
+           : '仲差 $' + (58 - s) + ' 換牛丸兌換券！');
 }
 function fitPromo(){
   var w = el('promoWrap');
