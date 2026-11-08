@@ -185,12 +185,24 @@
   .sheet .li .tags i{font-style:normal;font-size:10.5px;color:#6b6b6b;background:#f4f4f4;
         border-radius:3px;padding:2px 6px;white-space:nowrap}
   .sheet .li .tags i b{color:#c0392b}
-  .sheet .legal{font-size:10.5px;color:#aaa;text-align:center;margin-top:10px;line-height:1.6}
-  /* 兌換碼頁底部的官網兌換連結 */
-  .sheet .redeem{margin-top:12px;padding:11px 12px 12px;border:1px solid #f0d9a3;background:#fffdf6;border-radius:9px;text-align:center}
-  .sheet .redeem .rt{font-size:10.5px;color:#a08b7c;letter-spacing:.3px}
-  .sheet .redeem a{display:inline-block;margin-top:4px;font-size:13px;font-weight:700;color:#c0392b;
-        text-decoration:none;border-bottom:1px solid rgba(192,57,43,.4);padding-bottom:1px;word-break:break-all}
+  /* 落單成功後：已解鎖贈品摘要 + 領取指引 */
+  .sheet .glist{margin-top:2px;background:#fffaf0;border:1px solid #f3e3c8;border-radius:10px;padding:9px 11px 4px}
+  .sheet .glt{font-size:11px;font-weight:800;color:#b4530a;letter-spacing:.3px}
+  .sheet .gi{font-size:13px;font-weight:700;color:#3d2f23;padding:5px 0 6px;border-bottom:1px dashed #f0e2cd}
+  .sheet .gi:last-child{border-bottom:0}
+  .sheet .howto{margin-top:10px;padding:11px 12px 12px;border:1px solid #f2eadf;border-radius:10px;background:#fbfbfa}
+  .sheet .hwt{font-size:12.5px;font-weight:800;color:#2f2a25;margin-bottom:7px}
+  .sheet .hws{list-style:none;margin:0;padding:0;counter-reset:hw}
+  .sheet .hws li{counter-increment:hw;position:relative;padding-left:22px;font-size:12px;
+        color:#6b5c4c;line-height:1.5;margin-bottom:5px}
+  .sheet .hws li:before{content:counter(hw);position:absolute;left:0;top:1px;width:16px;height:16px;
+        border-radius:50%;background:#ff9500;color:#fff;font-size:10px;font-weight:800;
+        display:flex;align-items:center;justify-content:center}
+  .sheet .hws li b{color:#2f2a25;font-weight:800}
+  .sheet .hwbtn{display:block;margin-top:9px;text-align:center;text-decoration:none;background:#ff9500;
+        color:#fff;font-size:14px;font-weight:800;padding:10px;border-radius:9px}
+  .sheet .hwbtn b{display:block;font-size:10px;font-weight:600;opacity:.85;margin-top:2px;letter-spacing:.2px}
+  .sheet .hwwarn{margin-top:7px;font-size:10.5px;color:#c0392b;text-align:center;line-height:1.4}
 
   /* ---- 规格弹窗 / 套餐弹窗（真实：attPopup + setMeal） ---- */
   .attpop{position:absolute;inset:0;background:#fff;z-index:80;display:none;flex-direction:column}
@@ -668,9 +680,8 @@ function openCart(){
     }
   }
   html += '<div class="tot"><span>合計</span><span class="v">$' + money(t.sum) + '</span></div>'
-    + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '前往支付並領取贈品兌換碼' : '前往點餐') + '</button>'
-    + '<button class="ghost" onclick="closeSheet()">繼續點餐</button>'
-    + '<div class="legal">示範畫面，不對應真實交易。</div>';
+    + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '前往支付並領取贈品' : '前往點餐') + '</button>'
+    + '<button class="ghost" onclick="closeSheet()">繼續點餐</button>';
   el('sheet').innerHTML = html;
   el('mask').classList.add('on');
 }
@@ -693,9 +704,8 @@ function openBill(){
         + '</div><div class="r">$' + money(i.p * i.q) + '</div></div>';
     });
     return void (el('sheet').innerHTML = html + '<div class="tot"><span>賬單合計</span><span class="v">$' + money(t.sum) + '</span></div>'
-      + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '加單並領取贈品兌換碼' : '加單') + '</button>'
-      + '<button class="ghost" onclick="closeSheet()">返回</button>'
-      + '<div class="legal">示範畫面，不對應真實交易。</div>', el('mask').classList.add('on'));
+      + '<button class="big" onclick="place()">' + (MODE === 'ideal' ? '加單並領取贈品' : '加單') + '</button>'
+      + '<button class="ghost" onclick="closeSheet()">返回</button>', el('mask').classList.add('on'));
   }
   el('sheet').innerHTML = html + '<button class="ghost" onclick="closeSheet()">返回</button>';
   el('mask').classList.add('on');
@@ -703,29 +713,34 @@ function openBill(){
 function closeSheet(){ el('mask').classList.remove('on'); }
 
 function place(){
-  var t = totals(), got = false;
+  var t = totals(), gifts = [];
   var html = '<h3>落單成功</h3><div class="s">已送廚房　·　合計 $' + money(t.sum) + '</div>';
-  if (MODE === 'ideal' && t.sum >= G1) {
-    got = true;
-    html += '<div class="li"><div class="l"><b>新品！即食牛丸兌換券</b><em>憑券於大埔振興門市／官網／App 兌換，有效期 30 日</em></div></div>'
-      + '<div style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;background:#fffbea;border:1px dashed #d9b96a;border-radius:8px;padding:10px;text-align:center;color:#8a5e0b">TPCH-' + code() + '</div>';
-  }
+  if (MODE === 'ideal' && t.sum >= G1) gifts.push('新品！即食牛丸兌換券');
   if (MODE === 'ideal' && t.sum >= G2 && STOCK > 0) {
-    got = true;
-    html += '<div class="li" style="margin-top:8px"><div class="l"><b>限量「丸侠」公仔兌換券</b><em>憑券向店員領取，每日限量 20 隻</em></div></div>'
-      + '<div style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;background:#fffbea;border:1px dashed #d9b96a;border-radius:8px;padding:10px;text-align:center;color:#8a5e0b">MARBLE-' + code() + '</div>';
+    gifts.push('限量「丸侠」公仔 1 隻（每日限量 20 隻）');
     STOCK--;
   }
-  if (MODE === 'ideal' && got) {
-    html += '<div class="redeem"><div class="rt">兌換碼亦可於官網線上兌換</div>'
-      + '<a href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer">https://www.tpch.com.hk/</a></div>';
+  if (gifts.length) {
+    html += '<div class="glist"><div class="glt">已解鎖 ' + gifts.length + ' 份贈品</div>'
+      + gifts.map(function(g){ return '<div class="gi">' + g + '</div>'; }).join('')
+      + '</div>'
+      + '<div class="howto">'
+      +   '<div class="hwt">領取贈品 3 步</div>'
+      +   '<ol class="hws">'
+      +     '<li>點擊下方按鈕，前往大埔振興官網</li>'
+      +     '<li>註冊新會員，或登入現有帳號</li>'
+      +     '<li>向店員出示<b>會員頁面</b>，核對後即場領取贈品</li>'
+      +   '</ol>'
+      +   '<a class="hwbtn" href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer">前往官網註冊／登入會員<b>www.tpch.com.hk</b></a>'
+      +   '<div class="hwwarn">未完成會員註冊／登入，店員無法發放贈品</div>'
+      + '</div>';
   }
-  html += '<button class="big" style="margin-top:14px" onclick="CART={};closeSheet();render()">完成</button>'
-    + '<div class="legal">示範畫面，不對應真實交易。</div>';
+  html += gifts.length
+    ? '<button class="ghost" style="margin-top:4px" onclick="CART={};closeSheet();render()">完成</button>'
+    : '<button class="big" style="margin-top:14px" onclick="CART={};closeSheet();render()">完成</button>';
   el('sheet').innerHTML = html;
   renderBars();
 }
-function code(){ var s='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',o=''; for(var i=0;i<6;i++) o+=s[Math.floor(Math.random()*s.length)]; return o; }
 
 /* ---------- 规格弹窗（真实 attPopup）与套餐弹窗（真实 setMeal） ---------- */
 var ATTOPEN = null, ATT_SEL = [], SET_SEL = [], SETON = false, DETAIL = {};
