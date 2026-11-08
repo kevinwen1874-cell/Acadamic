@@ -134,7 +134,7 @@
         border-radius:5px;padding:3px 7px;display:inline-block}
 
   /* ---- 底部工具条（真实：#474747 + 圆形购物车 + 賬單記錄/下單） ---- */
-  /* ---- 活動區收起後：下單框上方的贈品進度條（滿 $58 / $88） ---- */
+  /* ---- 活動區收起後：下單框上方的贈品進度條（滿 $88 / $188） ---- */
   .mini{flex:none;max-height:0;overflow:hidden;background:#fff;
         transition:max-height .26s cubic-bezier(.4,0,.2,1)}
   .mini.on{max-height:56px}
@@ -186,6 +186,11 @@
         border-radius:3px;padding:2px 6px;white-space:nowrap}
   .sheet .li .tags i b{color:#c0392b}
   .sheet .legal{font-size:10.5px;color:#aaa;text-align:center;margin-top:10px;line-height:1.6}
+  /* 兌換碼頁底部的官網兌換連結 */
+  .sheet .redeem{margin-top:12px;padding:11px 12px 12px;border:1px solid #f0d9a3;background:#fffdf6;border-radius:9px;text-align:center}
+  .sheet .redeem .rt{font-size:10.5px;color:#a08b7c;letter-spacing:.3px}
+  .sheet .redeem a{display:inline-block;margin-top:4px;font-size:13px;font-weight:700;color:#c0392b;
+        text-decoration:none;border-bottom:1px solid rgba(192,57,43,.4);padding-bottom:1px;word-break:break-all}
 
   /* ---- 规格弹窗 / 套餐弹窗（真实：attPopup + setMeal） ---- */
   .attpop{position:absolute;inset:0;background:#fff;z-index:80;display:none;flex-direction:column}
@@ -321,11 +326,11 @@
         <!-- 理想版：赠品进度 -->
         <div class="gifts hidden" id="giftBar">
           <div class="gt">今日贈品進度</div>
-          <div class="gh" id="giftHint">仲差 $88 就解鎖「丸侠」限量公仔</div>
+          <div class="gh" id="giftHint">仲差 $88 就解鎖牛丸兌換券</div>
           <div class="track"><div class="fill" id="fill"></div></div>
           <div class="rows">
-            <div class="g" id="g58"><b>滿 $58</b><span>急凍小分量牛丸 100g 兌換券</span><em>未解鎖</em></div>
-            <div class="g" id="g88"><b>滿 $88</b><span>限量「丸侠」公仔 1 隻（每店每日 20 隻）</span><em>未解鎖</em></div>
+            <div class="g" id="g88"><b>滿 $88</b><span>急凍小分量牛丸 100g 兌換券</span><em>未解鎖</em></div>
+            <div class="g" id="g188"><b>滿 $188</b><span id="dollTxt">限量「丸侠」公仔 1 隻（還剩 20 隻！）</span><em>未解鎖</em></div>
           </div>
         </div>
         </div></div>
@@ -339,12 +344,12 @@
         <!-- 活動區收起後：下單框上方的贈品進度條 -->
         <div class="mini" id="miniProg"><div class="miniIn">
           <div class="mrow">
-            <span class="mk" id="mk58">滿 $58</span>
             <span class="mk" id="mk88">滿 $88</span>
-            <em id="miniTip">仲差 $58 換牛丸兌換券！</em>
+            <span class="mk" id="mk188">滿 $188</span>
+            <em id="miniTip">仲差 $88 換牛丸兌換券！</em>
           </div>
           <div class="mbar"><div class="mfill" id="miniFill"></div>
-            <i class="tk" style="left:58%"></i><i class="tk end" style="left:88%"></i>
+            <i class="tk" style="left:46.8%"></i>
           </div>
         </div></div>
 
@@ -417,6 +422,8 @@ var SET_GROUPS = [
 ];
 
 var CART = {}, MODE = 'actual', CAT = CATS[0], Q = '';
+/* 贈品門檻：滿 $88 送牛丸兌換券；滿 $188 送限量「丸侠」公仔（每日限量 STOCK 隻） */
+var G1 = 88, G2 = 188, STOCK = 20;
 
 function el(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
@@ -533,29 +540,20 @@ function totals(){
 }
 
 function renderBars(){
-  var t = totals();
-  if (MODE === 'ideal') {
-    var goal = t.sum >= 88 ? 1 : t.sum / 88;
-    el('fill').style.width = Math.min(100, goal * 100) + '%';
-    var o58 = t.sum >= 58, o88 = t.sum >= 88;
-    [['g58', o58], ['g88', o88]].forEach(function(p){
-      var e = el(p[0]);
-      e.className = 'g' + (p[1] ? ' ok' : '');
-      e.querySelector('em').textContent = p[1] ? '✓ 已解鎖' : '未解鎖';
-    });
-    var left = Math.max(0, 88 - t.sum);
-    el('giftHint').textContent = left > 0 ? ('仲差 $' + left + ' 就解鎖「丸侠」限量公仔') : '已解鎖全部贈品，多謝支持！';
-  } else {
-    el('fill').style.width = '0%';
-    var o58b = t.sum >= 58, o88b = t.sum >= 88;
-    [['g58', o58b], ['g88', o88b]].forEach(function(p){
-      var e = el(p[0]);
-      e.className = 'g' + (p[1] ? ' ok' : '');
-      e.querySelector('em').textContent = p[1] ? '✓ 已解鎖' : '未解鎖';
-    });
-    var leftb = Math.max(0, 88 - t.sum);
-    el('giftHint').textContent = leftb > 0 ? ('仲差 $' + leftb + ' 就解鎖「丸侠」限量公仔') : '已解鎖全部贈品，多謝支持！';
-  }
+  var t = totals(), s = t.sum;
+  var o1 = s >= G1, o2 = s >= G2 && STOCK > 0;
+  el('fill').style.width = Math.min(100, s / G2 * 100) + '%';
+  [['g88', o1], ['g188', o2]].forEach(function(p){
+    var e = el(p[0]);
+    e.className = 'g' + (p[1] ? ' ok' : '');
+    e.querySelector('em').textContent = p[1] ? '✓ 已解鎖' : '未解鎖';
+  });
+  el('dollTxt').textContent = '限量「丸侠」公仔 1 隻（'
+    + (STOCK > 0 ? '還剩 ' + STOCK + ' 隻！' : '今日已送完') + '）';
+  el('giftHint').textContent = s >= G2
+    ? (STOCK > 0 ? '已解鎖全部贈品，多謝支持！' : '牛丸兌換券已解鎖；公仔今日已送完')
+    : (s >= G1 ? ('仲差 $' + (G2 - s) + ' 就解鎖「丸侠」限量公仔')
+               : ('仲差 $' + (G1 - s) + ' 就解鎖牛丸兌換券'));
   var b = el('cartBadge');
   if (MODE === 'ideal' && t.n > 0) {
     b.classList.remove('hidden'); b.textContent = t.n;
@@ -587,16 +585,17 @@ function updMini(){
   el('miniProg').classList.toggle('on', on);
   if (!on) return;
   var t = totals(), s = t.sum;
-  el('miniFill').style.width = Math.min(100, s) + '%';
-  var o58 = s >= 58, o88 = s >= 88;
-  var k58 = el('mk58'), k88 = el('mk88');
-  k58.className = 'mk' + (o58 ? ' ok' : '');
-  k88.className = 'mk' + (o88 ? ' ok' : '');
-  k58.textContent = (o58 ? '✓ ' : '') + '滿 $58';
-  k88.textContent = (o88 ? '✓ ' : '') + '滿 $88';
-  el('miniTip').textContent = o88 ? '已解鎖全部贈品'
-    : (o58 ? '仲差 $' + (88 - s) + ' 再送「丸侠」公仔！！'
-           : '仲差 $' + (58 - s) + ' 換牛丸兌換券！');
+  el('miniFill').style.width = Math.min(100, s / G2 * 100) + '%';
+  var o1 = s >= G1, o2 = s >= G2 && STOCK > 0;
+  var k1 = el('mk88'), k2 = el('mk188');
+  k1.className = 'mk' + (o1 ? ' ok' : '');
+  k2.className = 'mk' + (o2 ? ' ok' : '');
+  k1.textContent = (o1 ? '✓ ' : '') + '滿 $' + G1;
+  k2.textContent = (o2 ? '✓ ' : '') + '滿 $' + G2;
+  el('miniTip').textContent = s >= G2
+    ? (STOCK > 0 ? '已解鎖全部贈品' : '公仔今日已送完')
+    : (s >= G1 ? ('仲差 $' + (G2 - s) + ' 再送「丸侠」公仔！！')
+               : ('仲差 $' + (G1 - s) + ' 換牛丸兌換券！'));
 }
 function fitPromo(){
   var w = el('promoWrap');
@@ -704,19 +703,27 @@ function openBill(){
 function closeSheet(){ el('mask').classList.remove('on'); }
 
 function place(){
-  var t = totals();
+  var t = totals(), got = false;
   var html = '<h3>落單成功</h3><div class="s">已送廚房　·　合計 $' + money(t.sum) + '</div>';
-  if (MODE === 'ideal' && t.sum >= 58) {
+  if (MODE === 'ideal' && t.sum >= G1) {
+    got = true;
     html += '<div class="li"><div class="l"><b>急凍小分量牛丸 100g 兌換券</b><em>憑券於大埔振興門市／官網／App 兌換，有效期 30 日</em></div></div>'
       + '<div style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;background:#fffbea;border:1px dashed #d9b96a;border-radius:8px;padding:10px;text-align:center;color:#8a5e0b">TPCH-' + code() + '</div>';
   }
-  if (MODE === 'ideal' && t.sum >= 88) {
-    html += '<div class="li" style="margin-top:8px"><div class="l"><b>限量「丸侠」公仔兌換券</b><em>憑券向店員領取，每店每日 20 隻</em></div></div>'
+  if (MODE === 'ideal' && t.sum >= G2 && STOCK > 0) {
+    got = true;
+    html += '<div class="li" style="margin-top:8px"><div class="l"><b>限量「丸侠」公仔兌換券</b><em>憑券向店員領取，每日限量 20 隻</em></div></div>'
       + '<div style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;background:#fffbea;border:1px dashed #d9b96a;border-radius:8px;padding:10px;text-align:center;color:#8a5e0b">MARBLE-' + code() + '</div>';
+    STOCK--;
+  }
+  if (MODE === 'ideal' && got) {
+    html += '<div class="redeem"><div class="rt">兌換碼亦可於官網線上兌換</div>'
+      + '<a href="https://www.tpch.com.hk/" target="_blank" rel="noopener noreferrer">https://www.tpch.com.hk/</a></div>';
   }
   html += '<button class="big" style="margin-top:14px" onclick="CART={};closeSheet();render()">完成</button>'
     + '<div class="legal">示範畫面，不對應真實交易。</div>';
   el('sheet').innerHTML = html;
+  renderBars();
 }
 function code(){ var s='ABCDEFGHJKLMNPQRSTUVWXYZ23456789',o=''; for(var i=0;i<6;i++) o+=s[Math.floor(Math.random()*s.length)]; return o; }
 
@@ -915,7 +922,7 @@ function setMode(m){
     ? '<div style="width:100%;height:100%;background:linear-gradient(160deg,#c0392b,#7a1010);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center">'
       + '<div style="font-size:11px;letter-spacing:3px;opacity:.85">TUESDAY ONLY</div>'
       + '<div style="font-size:30px;font-weight:800;margin:6px 0 8px">丸事星期二</div>'
-      + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類菜式加量 2 粒<br>滿 $88 送限量「丸侠」</div>'
+      + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類菜式加量 2 粒<br>滿 $88 送牛丸券 · 滿 $188 送「丸侠」</div>'
       + '<div style="margin-top:14px">' + mascot(96) + '</div></div>'
     : '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
   el('actMascot').innerHTML = mascot(92);
