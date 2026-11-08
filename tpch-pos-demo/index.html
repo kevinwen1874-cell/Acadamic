@@ -134,6 +134,21 @@
         border-radius:5px;padding:3px 7px;display:inline-block}
 
   /* ---- 底部工具条（真实：#474747 + 圆形购物车 + 賬單記錄/下單） ---- */
+  /* ---- 活動區收起後：下單框上方的贈品進度條（滿 $58 / $88） ---- */
+  .mini{flex:none;max-height:0;overflow:hidden;background:#fff;
+        transition:max-height .26s cubic-bezier(.4,0,.2,1)}
+  .mini.on{max-height:56px}
+  .miniIn{padding:6px 12px 8px;border-top:1px solid #f0e6da}
+  .mini .mrow{display:flex;align-items:center;gap:5px;font-size:10px;margin-bottom:4px}
+  .mini .mk{background:#f7efe6;color:#9a6b12;border-radius:99px;padding:1px 6px;font-weight:700;line-height:1.5}
+  .mini .mk.ok{background:#f3faf5;color:#2e7d52}
+  .mini .mrow em{margin-left:auto;font-style:normal;color:#8a7e70;font-size:10px}
+  .mini .mbar{position:relative;height:7px;background:#f1e9df;border-radius:99px;overflow:hidden}
+  .mini .mfill{height:100%;width:0;border-radius:99px;
+        background:linear-gradient(90deg,#e8a33d,#c0392b);transition:width .35s}
+  .mini .tk{position:absolute;top:0;width:1px;height:100%;background:rgba(0,0,0,.16)}
+  .mini .tk.end{background:rgba(0,0,0,.3)}
+
   .toolbar{height:60px;background:#474747;position:relative;display:flex;align-items:center;padding-left:86px;padding-right:10px;flex:none}
   .cartbtn{position:absolute;left:15px;bottom:5px;width:60px;height:55px;border-radius:50%;background:#fff;
         border:2px solid #ffa500;display:flex;align-items:center;justify-content:center;cursor:pointer;padding-bottom:5px}
@@ -320,6 +335,18 @@
           <div class="cats" id="cats"></div>
           <div class="items" id="items"></div>
         </div>
+
+        <!-- 活動區收起後：下單框上方的贈品進度條 -->
+        <div class="mini" id="miniProg"><div class="miniIn">
+          <div class="mrow">
+            <span class="mk" id="mk58">滿 $58</span>
+            <span class="mk" id="mk88">滿 $88</span>
+            <em id="miniTip">仲差 $88 解鎖「丸侠」</em>
+          </div>
+          <div class="mbar"><div class="mfill" id="miniFill"></div>
+            <i class="tk" style="left:58%"></i><i class="tk end" style="left:88%"></i>
+          </div>
+        </div></div>
 
         <!-- 底部工具条 -->
         <div class="toolbar">
@@ -536,6 +563,7 @@ function renderBars(){
   var ob = el('orderBtn');
   if (t.n > 0) { ob.classList.add('act'); ob.textContent = '下單'; }
   else { ob.classList.remove('act'); ob.textContent = '下單'; }
+  updMini();
 }
 
 /* ---------- 活動區：不鎖死，上劃收起（把半屏版面還給菜單） ---------- */
@@ -550,6 +578,25 @@ function setPromo(min){
   var w = el('promoWrap');
   w.style.height = (min ? 0 : promoNatH()) + 'px';
   w.classList.toggle('min', min);
+  updMini();
+}
+
+/* 活動區收起後，底部下單框上方的贈品進度條 */
+function updMini(){
+  var on = (MODE === 'ideal' && PROMO_MIN);
+  el('miniProg').classList.toggle('on', on);
+  if (!on) return;
+  var t = totals(), s = t.sum;
+  el('miniFill').style.width = Math.min(100, s) + '%';
+  var o58 = s >= 58, o88 = s >= 88;
+  var k58 = el('mk58'), k88 = el('mk88');
+  k58.className = 'mk' + (o58 ? ' ok' : '');
+  k88.className = 'mk' + (o88 ? ' ok' : '');
+  k58.textContent = (o58 ? '✓ ' : '') + '滿 $58';
+  k88.textContent = (o88 ? '✓ ' : '') + '滿 $88';
+  el('miniTip').textContent = o88 ? '已解鎖全部贈品'
+    : (o58 ? '仲差 $' + (88 - s) + ' 再送「丸侠」公仔'
+           : '仲差 $' + (58 - s) + ' 換牛丸兌換券');
 }
 function fitPromo(){
   var w = el('promoWrap');
