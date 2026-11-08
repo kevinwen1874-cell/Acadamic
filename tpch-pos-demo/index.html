@@ -326,10 +326,10 @@
         <!-- 理想版：赠品进度 -->
         <div class="gifts hidden" id="giftBar">
           <div class="gt">今日贈品進度</div>
-          <div class="gh" id="giftHint">仲差 $88 就解鎖牛丸兌換券</div>
+          <div class="gh" id="giftHint">仲差 $88 就解鎖即食牛丸兌換券</div>
           <div class="track"><div class="fill" id="fill"></div></div>
           <div class="rows">
-            <div class="g" id="g88"><b>滿 $88</b><span>急凍小分量牛丸 100g 兌換券</span><em>未解鎖</em></div>
+            <div class="g" id="g88"><b>滿 $88</b><span>新品！即食牛丸兌換券</span><em>未解鎖</em></div>
             <div class="g" id="g188"><b>滿 $188</b><span id="dollTxt">限量「丸侠」公仔 1 隻（還剩 20 隻！）</span><em>未解鎖</em></div>
           </div>
         </div>
@@ -346,7 +346,7 @@
           <div class="mrow">
             <span class="mk" id="mk88">滿 $88</span>
             <span class="mk" id="mk188">滿 $188</span>
-            <em id="miniTip">仲差 $88 換牛丸兌換券！</em>
+            <em id="miniTip">仲差 $88 換即食牛丸兌換券！</em>
           </div>
           <div class="mbar"><div class="mfill" id="miniFill"></div>
             <i class="tk" style="left:46.8%"></i>
@@ -422,7 +422,7 @@ var SET_GROUPS = [
 ];
 
 var CART = {}, MODE = 'actual', CAT = CATS[0], Q = '';
-/* 贈品門檻：滿 $88 送牛丸兌換券；滿 $188 送限量「丸侠」公仔（每日限量 STOCK 隻） */
+/* 贈品門檻：滿 $88 送新品即食牛丸兌換券；滿 $188 送限量「丸侠」公仔（每日限量 STOCK 隻） */
 var G1 = 88, G2 = 188, STOCK = 20;
 
 function el(id){ return document.getElementById(id); }
@@ -551,9 +551,9 @@ function renderBars(){
   el('dollTxt').textContent = '限量「丸侠」公仔 1 隻（'
     + (STOCK > 0 ? '還剩 ' + STOCK + ' 隻！' : '今日已送完') + '）';
   el('giftHint').textContent = s >= G2
-    ? (STOCK > 0 ? '已解鎖全部贈品，多謝支持！' : '牛丸兌換券已解鎖；公仔今日已送完')
+    ? (STOCK > 0 ? '已解鎖全部贈品，多謝支持！' : '即食牛丸兌換券已解鎖；公仔今日已送完')
     : (s >= G1 ? ('仲差 $' + (G2 - s) + ' 就解鎖「丸侠」限量公仔')
-               : ('仲差 $' + (G1 - s) + ' 就解鎖牛丸兌換券'));
+               : ('仲差 $' + (G1 - s) + ' 就解鎖即食牛丸兌換券'));
   var b = el('cartBadge');
   if (MODE === 'ideal' && t.n > 0) {
     b.classList.remove('hidden'); b.textContent = t.n;
@@ -595,7 +595,7 @@ function updMini(){
   el('miniTip').textContent = s >= G2
     ? (STOCK > 0 ? '已解鎖全部贈品' : '公仔今日已送完')
     : (s >= G1 ? ('仲差 $' + (G2 - s) + ' 再送「丸侠」公仔！！')
-               : ('仲差 $' + (G1 - s) + ' 換牛丸兌換券！'));
+               : ('仲差 $' + (G1 - s) + ' 換即食牛丸兌換券！'));
 }
 function fitPromo(){
   var w = el('promoWrap');
@@ -707,7 +707,7 @@ function place(){
   var html = '<h3>落單成功</h3><div class="s">已送廚房　·　合計 $' + money(t.sum) + '</div>';
   if (MODE === 'ideal' && t.sum >= G1) {
     got = true;
-    html += '<div class="li"><div class="l"><b>急凍小分量牛丸 100g 兌換券</b><em>憑券於大埔振興門市／官網／App 兌換，有效期 30 日</em></div></div>'
+    html += '<div class="li"><div class="l"><b>新品！即食牛丸兌換券</b><em>憑券於大埔振興門市／官網／App 兌換，有效期 30 日</em></div></div>'
       + '<div style="font-family:monospace;font-size:16px;font-weight:700;letter-spacing:2px;background:#fffbea;border:1px dashed #d9b96a;border-radius:8px;padding:10px;text-align:center;color:#8a5e0b">TPCH-' + code() + '</div>';
   }
   if (MODE === 'ideal' && t.sum >= G2 && STOCK > 0) {
@@ -922,7 +922,7 @@ function setMode(m){
     ? '<div style="width:100%;height:100%;background:linear-gradient(160deg,#c0392b,#7a1010);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center">'
       + '<div style="font-size:11px;letter-spacing:3px;opacity:.85">TUESDAY ONLY</div>'
       + '<div style="font-size:30px;font-weight:800;margin:6px 0 8px">丸事星期二</div>'
-      + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類菜式加量 2 粒<br>滿 $88 送牛丸券 · 滿 $188 送「丸侠」</div>'
+      + '<div style="font-size:13px;line-height:1.7;opacity:.95">指定振興丸類菜式加量 2 粒<br>滿 $88 送即食牛丸券 · 滿 $188 送「丸侠」</div>'
       + '<div style="margin-top:14px">' + mascot(96) + '</div></div>'
     : '<div class="adnote">（原系統此處為 9:16 廣告圖位置）</div>';
   el('actMascot').innerHTML = mascot(92);
